@@ -16,9 +16,9 @@ export const COLORS = {
     O: { key: 'bloque_O', path: 'assets/Sprites/Cubo_Naranja.png' },
     T: { key: 'bloque_T', path: 'assets/Sprites/Cubo_Morado.png' },
     S: { key: 'bloque_S', path: 'assets/Sprites/Cubo_Verde.png' },
-    Z: { key: 'bloque_Z', path: 'assets/Sprites/Cubo_Verde.png' },
-    J: { key: 'bloque_J', path: 'assets/Sprites/Cubo_Verde.png' },
-    L: { key: 'bloque_L', path: 'assets/Sprites/Cubo_Verde.png' },
+    Z: { key: 'bloque_Z', path: 'assets/Sprites/Cubo_Cian.png' },
+    J: { key: 'bloque_J', path: 'assets/Sprites/Cubo_Amarillo.png' },
+    L: { key: 'bloque_L', path: 'assets/Sprites/Cubo_Rojo.png' },
 };
 
 //Rotación 90 grados
