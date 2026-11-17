@@ -4,6 +4,7 @@ import { Tablero } from '../entities/Tablero';
 import { SHAPES, COLORS, rotateCW } from '../config/pieza';
 
 export class JuegoScene extends Phaser.Scene {
+    
     constructor() {
         super('JuegoScene');
     }
@@ -11,16 +12,19 @@ export class JuegoScene extends Phaser.Scene {
     init() {
         this.players = new Map();
         this.inputMappings = [];
+        this.typeArray = [];
+        this.linesCleared = 0;
     }
 
     preload() {
         // Load assets
 
         //imágenes
-        this.load.image('fondo', 'assets/Sprites/Fondo.png')
+        this.load.image('fondo', 'assets/Sprites/Fondo.png');
 
-        this.load.image('infoJugador1', 'assets/Sprites/Info_Box_Amarillo.png')
-        this.load.image('infoJugador2', 'assets/Sprites/Info_Box_Naranja.png')
+    
+        this.load.image('infoJugador1', 'assets/Sprites/Info_Box_Amarillo.png');
+        this.load.image('infoJugador2', 'assets/Sprites/Info_Box_Naranja.png');
 
         //evitamos escribir lo mismo 7 veces
         Object.values(COLORS).forEach(({ key, path }) => {
@@ -39,12 +43,20 @@ export class JuegoScene extends Phaser.Scene {
         //fondo
         this.add.image(width / 2, height / 2, 'fondo').setDisplaySize(width, height);
 
-        //cajas
+        //cajas (guardamos su info para poder acceder a su posición y/o tamaño)
         //this.add.image(width / 2 * 0.3, height / 2 * 1.1, 'infoJugador1').setScale(0.7);
         //this.add.image(width / 2 * 1.67, height / 2 * 0.8, 'infoJugador2').setScale(0.3);
-        this.createInfoBox('infoJugador1', infoBox.boxP1, width, height);
-        this.createInfoBox('infoJugador2', infoBox.boxP2, width, height);
+        this.box1 = this.createInfoBox('infoJugador1', infoBox.boxP1, width, height);
+        this.box2 = this.createInfoBox('infoJugador2', infoBox.boxP2, width, height);
 
+        //este texto dice cuántas líneas ha limpiado el jugador del tetris
+        this.linesText = this.add.text(this.box1.x, this.box1.y, 'Líneas: 0', {
+            fontFamily: 'Comic Sans MS',
+            fontSize: ' 30px',
+            color: '#000000',
+        }).setOrigin(0.5);
+
+        //SetOririgin nos permite que el punto de referencia del texto sea el centro, lo que nos facilita centrarlo en la caja de info
 
         // Looping background music
         this.music = this.sound.add('gameMusic', { loop: true, volume: 0.3 });
@@ -109,10 +121,21 @@ export class JuegoScene extends Phaser.Scene {
         });
     }
 
+
     spawnPiece() {
-        const type = this.nextType();
+        //Si no hay piezas en el array, se generan las dos piezas iniciales
+
+        if(!this.typeArray.length) {
+            this.typeArray.push(this.nextType());
+            this.typeArray.push(this.nextType());
+        }
+
+        const type = this.typeArray.shift(); //saca la primera pieza del array
+        this.typeArray.push(this.nextType()); //añade una nueva pieza al final del array
+
         //se crea la pieza mirando el tipo, se pone en la fila directamente (con ...), no el array
         const matrix = SHAPES[type].map(row => [...row]);
+
         this.piece = {
             type,
             matrix,
@@ -167,7 +190,9 @@ export class JuegoScene extends Phaser.Scene {
     lockPiece() {
         const { matrix, x, y, type } = this.piece;
         this.board.lockPiece(matrix, x, y, type);
-        this.board.clearLine(); //si no se ha limpiado ninguna, no importa
+        this.linesCleared += this.board.clearLine(); //actualiza el número de líneas limpiadas
+        //this.board.clearLine(); //si no se ha limpiado ninguna, no importa
+        this.linesText.setText('Líneas: ' + this.linesCleared); //actualiza el texto de las líneas
         this.spawnPiece();
     }
 
@@ -175,6 +200,9 @@ export class JuegoScene extends Phaser.Scene {
     render() {
         this.blocks.clear(true, true); //borramos todo
 
+        this.drawNextPiece(0, 70);
+        this.drawNextPiece(1, 250);
+        
         //r y c = fila y columna. Si existe algo de un tipo en esa casilla, dibuja un cuadrado de ese tipo
         this.board.grid.forEach((row, r) =>
             row.forEach((type, c) => type && this.drawCell(c, r, type))
@@ -188,6 +216,26 @@ export class JuegoScene extends Phaser.Scene {
         }
     }
 
+    drawNextPiece(piece, paddingX) {
+        const nextType = this.typeArray[piece];
+        const nextMatrix = SHAPES[nextType];
+
+        //La posición donde se ve la pieza siguiente
+        const startX = this.box1.x - this.box1.displayWidth / 2 + this.cell / 2 + paddingX;
+        const startY = this.box1.y - this.box1.displayHeight / 2 + this.cell / 2 + 40;
+
+        nextMatrix.forEach((row, r) => {
+            row.forEach((cell, c) => {
+                if (cell) {
+                    const posX = startX + c * this.cell + this.cell / 2;
+                    const posY = startY + r * this.cell + this.cell / 2;
+                    const sprite = this.add.image(posX, posY, COLORS[nextType].key).setDisplaySize(this.cell, this.cell);
+                    this.blocks.add(sprite);
+                }
+            });
+        });
+    }
+        
     gameOver() {
         this.fallTimer.remove();
         this.piece = null;

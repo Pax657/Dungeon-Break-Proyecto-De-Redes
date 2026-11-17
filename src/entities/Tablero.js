@@ -54,6 +54,7 @@ export class Tablero {
         //crea un array lleno de nulos para después ponerlo por encima de los otros guardados
         const empty = Array.from({ length: cleared }, () => Array(this.cols).fill(null));
         this.grid = [...empty, ...kept]; //los 3 puntos vuelcan todos los elementos, no el array únicamente
+        
 
         return cleared;
     }
