@@ -45,10 +45,22 @@ export class Tablero {
     }
 
     //borra filas COMPLETAS, baja las que estén arriba y devuelve cuántas borró
+    savedLines() {
+              const cRows = [];
+        this.grid.forEach((row, i) => {
+            if(row.every(cell => cell != null))  {
+                cRows.push(i);
+            }
+        }); 
+        return cRows;
+              }
+       
+    
+
     clearLine() {
         //nos quedamos con las filas NO completas
         //filtramos en el grid usando "some" que devuelve true si al menos una casilla está vacía
-        const kept = this.grid.filter(row => row.some(cell => !cell));
+        const kept = this.grid.filter(row => row.some(cell => !cell));        
         const cleared = this.rows - kept.length;
 
         //crea un array lleno de nulos para después ponerlo por encima de los otros guardados
@@ -57,5 +69,6 @@ export class Tablero {
         
 
         return cleared;
-    }
-}
+    } 
+} 
+ 

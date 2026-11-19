@@ -26,6 +26,7 @@ export class JuegoScene extends Phaser.Scene {
         this.load.image('infoJugador1', 'assets/Sprites/Info_Box_Amarillo.png');
         this.load.image('infoJugador2', 'assets/Sprites/Info_Box_Naranja.png');
 
+
         //evitamos escribir lo mismo 7 veces
         Object.values(COLORS).forEach(({ key, path }) => {
             this.load.image(key, path);
@@ -33,6 +34,8 @@ export class JuegoScene extends Phaser.Scene {
 
         // Background music
         this.load.audio('gameMusic', 'assets/audio/music.mp3');
+        this.load.audio('protacion', 'assets/Sonidos/protacion.mp3');
+        this.load.audio('clinea', 'assets/Sonidos/shoosh.mp3');
     }
 
     create() {
@@ -171,6 +174,7 @@ export class JuegoScene extends Phaser.Scene {
 
         if (this.board.isValid(rotated, this.piece.x, this.piece.y)) {
             this.piece.matrix = rotated;
+            this.sound.play("protacion", { volume: 0.3 });
             this.render();
         }
     }
@@ -190,28 +194,48 @@ export class JuegoScene extends Phaser.Scene {
     lockPiece() {
         const { matrix, x, y, type } = this.piece;
         this.board.lockPiece(matrix, x, y, type);
-        this.linesCleared += this.board.clearLine(); //actualiza el número de líneas limpiadas
-        //this.board.clearLine(); //si no se ha limpiado ninguna, no importa
-        this.linesText.setText('Líneas: ' + this.linesCleared); //actualiza el texto de las líneas
-        this.spawnPiece();
+        this.piece = null;
+        const completedRows = this.board.savedLines();
+
+        if (completedRows.length > 0) {
+            this.render(); 
+
+            this.time.delayedCall(250, () => {
+                this.linesCleared += this.board.clearLine(); 
+                this.linesText.setText('Líneas: ' + this.linesCleared);
+                this.spawnPiece(); 
+            });
+            
+         this.sound.play("clinea", { volume: 0.3 });
+        } else {
+            this.spawnPiece();
+        }
     }
 
     //dibujaremos el tablero fijo y la pieza activa (piece)
     render() {
+     
         this.blocks.clear(true, true); //borramos todo
 
         this.drawNextPiece(0, 70);
         this.drawNextPiece(1, 250);
+
+        const lineas = this.board.savedLines();
         
         //r y c = fila y columna. Si existe algo de un tipo en esa casilla, dibuja un cuadrado de ese tipo
         this.board.grid.forEach((row, r) =>
-            row.forEach((type, c) => type && this.drawCell(c, r, type))
+            row.forEach((type, c) => {
+                if(type) {
+                
+                    const cLine = lineas.includes(r);                               
+                     this.drawCell(c, r, type, cLine);
+                    }
+            })
         );
-
         if (this.piece) {
             const { matrix, x, y, type } = this.piece;
             matrix.forEach((row, r) => row.forEach((cell, c) => {
-                if (cell && y + r >= 0) this.drawCell(x + c, y + r, type);
+                if (cell && y + r >= 0) this.drawCell(x + c, y + r, type, false);
             }));
         }
     }
@@ -245,11 +269,14 @@ export class JuegoScene extends Phaser.Scene {
         this.add.text(width / 2, height / 2, 'GAME OVER', { fontSize: '128px' }).setOrigin(0.5);
     }
 
-    drawCell(col, row, type) {
+    drawCell(col, row, type, isWhite = false) {
         const celdaX = this.boardX + col * this.cell + this.cell / 2;
         const celdaY = this.boardY + row * this.cell + this.cell / 2;
         const sprite = this.add.image(celdaX, celdaY, COLORS[type].key).setDisplaySize(this.cell, this.cell);
 
+       if (isWhite) {
+        sprite.setTintFill(0xffffff);
+    }
         this.blocks.add(sprite);
     }
 
