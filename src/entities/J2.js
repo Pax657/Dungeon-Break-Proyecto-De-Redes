@@ -19,6 +19,7 @@ export class J2 {
         colliders.forEach(group => scene.physics.add.collider(this.sprite, group));
 
         const kb = scene.input.keyboard;
+
         this.keys = {
             left: kb.addKey(Controls.j2.left),
             right: kb.addKey(Controls.j2.right),

@@ -37,6 +37,9 @@ export class JuegoScene extends Phaser.Scene {
         this.box1 = this.createInfoBox(IMAGES.infoJugador1.key, infoBox.boxP1, width, height);
         this.box2 = this.createInfoBox(IMAGES.infoJugador2.key, infoBox.boxP2, width, height);
 
+        //Este menú permite comprar power ups para el jugador de tetris
+        this.createPowerUpMenu();
+
         //Musica
         this.setUpMusic();
 
@@ -61,8 +64,121 @@ export class JuegoScene extends Phaser.Scene {
 
         this.connectTetrisEvents();
         this.tetris.start();
+
+        this.normalSpeed = Balance.j2.speed;
+        this.normalFallSpeed = Balance.tetris.keys.down.repeatAfter;
+        this.normalLockDelay = Balance.tetris.lockDelay;
     }
 
+    createPowerUpMenu() {
+        const boxWidth = this.box1.displayWidth;
+        const boxHeight = this.box1.displayHeight;
+        const centerX = this.box1.x;
+
+        const startY = this.box1.y + 50; //Ajustar hasta que quede bien
+        const gap = Math.max(42, boxHeight * 0.11);
+        const buttonWidth = boxWidth * 0.7; //Ancho del botón, ajustar hasta que quede bien
+        const buttonHeight = 30; //Altura
+        const fontSize = '24px'; //Tamaño de la fuente
+
+        const buttonsPowerups = [
+            { label: '2 Líneas: Fiesta Palo', callback: () => this.PowerUp1Activation('PU1') },
+            { label: '3 Líneas: Jugador Cojo', callback: () => this.PowerUp2Activation('PU2') },
+            { label: '5 Líneas: Piezas Rápidas', callback: () => this.PowerUp3Activation('PU3') },
+        ];
+
+        this.box1MenuButtons = buttonsPowerups.map(({ label, callback }, index) => {
+            const y = startY + index * gap;
+
+            const background = this.add.rectangle(centerX, y, buttonWidth, buttonHeight, 0x1e293b, 0.9)
+                .setStrokeStyle(2, 0x94a3b8)
+                .setInteractive({ useHandCursor: true });
+
+            const text = this.add.text(centerX, y, label, {
+                fontSize,
+                color: '#ffffff',
+            }).setOrigin(0.5);
+
+            background.on('pointerover', () => {
+                background.setFillStyle(0x334155, 1);
+                background.setStrokeStyle(2, 0xf8fafc);
+            });
+
+            background.on('pointerout', () => {
+                background.setFillStyle(0x1e293b, 0.9);
+                background.setStrokeStyle(2, 0x94a3b8);
+            });
+
+            background.on('pointerdown', callback);
+
+            return { background, text };
+        });
+    }
+
+    PowerUp1Activation() {
+        if (this.tetris.linesCleared >= 2){
+            this.tetris.nextTypes = ['I', 'I', 'I', 'I', 'I'];
+        }   
+    }
+
+    PowerUp2Activation() {
+        if (this.tetris.linesCleared >= 3){
+
+            if(this.j2SpeedNerftimer){
+                this.j2SpeedNerftimer.remove(false);
+            }
+            
+            Balance.j2.speed = 150;
+
+            this.j2SpeedNerftimer = this.time.delayedCall(15000, () =>{
+                Balance.j2.speed = this.normalSpeed;
+
+                this.j2SpeedNerftimer = null;
+            });
+        }   
+    }
+
+    PowerUp3Activation() {
+        if (this.tetris.linesCleared >= 5){
+            
+            console.log('sí llego aquí');
+
+            if(this.j1Bufftimer){
+                this.j1Bufftimer.remove(false);
+            }
+
+            Balance.tetris.keys.down.repeatAfter = 30;
+
+            this.inputManager.updateBalance(this, {
+            left: () => this.tetris.movePiece(-1),
+            right: () => this.tetris.movePiece(1),
+            down: () => this.tetris.stepDown(),
+            rotate: () => this.tetris.rotatePiece(),
+            });
+
+            Balance.tetris.lockDelay = 1;
+
+            this.j1Bufftimer = this.time.delayedCall(15000, () =>{
+                Balance.tetris.keys.down.repeatAfter = this.normalFallSpeed;
+                Balance.tetris.lockDelay = this.normalLockDelay;
+
+                this.inputManager.updateBalance(this, {
+                left: () => this.tetris.movePiece(-1),
+                right: () => this.tetris.movePiece(1),
+                down: () => this.tetris.stepDown(),
+                rotate: () => this.tetris.rotatePiece(),
+                });;
+
+                this.j1Bufftimer= null;
+            });
+        }
+    }
+
+    //DANI TODO LO QUE HAGAS EMPIEZA AQUÍ
+
+
+    //Y ACABA AQUÍ
+    
     //conecta los sistemas de sonido, renderizado, colisiones y lógica
     connectTetrisEvents() {
         const t = this.tetris;
@@ -107,6 +223,15 @@ export class JuegoScene extends Phaser.Scene {
             this.events.off('resume');
             this.music.destroy();
         });
+    }
+
+    gameOver() {
+        this.fallTimer.remove();
+        this.piece = null;
+
+        //cambiar por escena GAMEOVER
+        const { width, height } = this.scale;
+        this.add.text(width / 2, height / 2, 'GAME OVER', { fontSize: '128px' }).setOrigin(0.5);
     }
 
     createInfoBox(key, pos, width, height) {

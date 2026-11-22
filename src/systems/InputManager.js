@@ -24,6 +24,18 @@ export class InputManager {
         });
     }
 
+    updateBalance(scene, actions){
+        const kb = scene.input.keyboard;
+        const { keys } = Balance.tetris;
+
+        //teclas que se mantienen
+        this.held = [
+            { key: kb.addKey(Controls.tetris.left), action: actions.left, repeatAfter: keys.left.repeatAfter, nextAt: null },
+            { key: kb.addKey(Controls.tetris.right), action: actions.right, repeatAfter: keys.right.repeatAfter, nextAt: null },
+            { key: kb.addKey(Controls.tetris.down), action: actions.down, repeatAfter: keys.down.repeatAfter, nextAt: null }
+        ];
+    }
+
     update(time) {
         const { firstRepeatDelay } = Balance.tetris;
 

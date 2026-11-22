@@ -11,7 +11,7 @@ export class TetrisRenderer {
 
         this.blocks = scene.add.group(); //todos los cubos en pantalla, para borrarlos de una vez
 
-        this.linesText = scene.add.text(infoBox.x, infoBox.y, 'Líneas: 0', {
+        this.linesText = scene.add.text(infoBox.x, infoBox.y - 90, 'Líneas: 0', {
             fontFamily: 'Comic Sans MS',
             fontSize: '30px',
             color: '#000000',
