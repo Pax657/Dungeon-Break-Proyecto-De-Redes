@@ -4,7 +4,7 @@ import { Tablero } from '../entities/Tablero';
 import { SHAPES, COLORS, rotateCW } from '../config/pieza';
 
 export class JuegoScene extends Phaser.Scene {
-    
+
     constructor() {
         super('JuegoScene');
     }
@@ -22,7 +22,7 @@ export class JuegoScene extends Phaser.Scene {
         //imágenes
         this.load.image('fondo', 'assets/Sprites/Fondo.png');
 
-    
+
         this.load.image('infoJugador1', 'assets/Sprites/Info_Box_Amarillo.png');
         this.load.image('infoJugador2', 'assets/Sprites/Info_Box_Naranja.png');
 
@@ -90,11 +90,11 @@ export class JuegoScene extends Phaser.Scene {
         this.createBoardWalls();
 
         this.createPlayer2();
-        
+
         this.physics.add.collider(this.player2, this.eternalGroundHitbox);
         this.physics.add.collider(this.player2, this.groundHitbox);
         this.physics.add.collider(this.player2, this.boardWallsHitbox);
-        
+
         this.cursors = this.input.keyboard.createCursorKeys();
     }
 
@@ -122,21 +122,29 @@ export class JuegoScene extends Phaser.Scene {
         //MAPEADO DE CONTROLES
         const kb = this.input.keyboard;
 
+        //Acciones de una pulsación
         this.inputMappings = [
-            { key: 'A', action: () => this.movePiece(-1) },
-            { key: 'D', action: () => this.movePiece(1) },
             { key: 'W', action: () => this.rotatePiece() },
-            { key: 'S', action: () => this.stepDown() },
         ];
 
-        this.inputMappings.forEach(({ key, action }) => {
-            kb.on(`keydown-${key}`, action);
+        const onKeyDown = (key, action) => (event) => {
+            if (!event.repeat) action();   //ignora el autoRepeat del sistema
+        };
+
+        this.inputMappings.forEach(m => {
+            m.handler = onKeyDown(m.key, m.action);
+            kb.on(`keydown-${m.key}`, m.handler);
         });
 
+        //Acciones mantenidas
+        this.keyHeld = [
+            { key: kb.addKey('A'), action: () => this.movePiece(-1), nextAt: null },
+            { key: kb.addKey('D'), action: () => this.movePiece(1), nextAt: null },
+            { key: kb.addKey('S'), action: () => this.stepDown(), nextAt: null },
+        ];
+
         this.events.once('shutdown', () => {
-            this.inputMappings.forEach(({ key, action }) => {
-                kb.off(`keydown-${key}`, action);
-            });
+            this.inputMappings.forEach(m => kb.off(`keydown-${m.key}`, m.handler));
         });
     }
 
@@ -172,7 +180,7 @@ export class JuegoScene extends Phaser.Scene {
         this.boardWallsHitbox.add(rightWall);
     }
 
-    createPlayer2(){
+    createPlayer2() {
         const size = this.cell * 0.7;
         const startX = this.boardX + (Layout.board.cols * this.cell) / 2;
         const startY = this.boardY + (Layout.board.rows * this.cell) - size;
@@ -181,7 +189,7 @@ export class JuegoScene extends Phaser.Scene {
         this.physics.add.existing(placeHolder); // Cuerpo dinámico por defecto
 
         placeHolder.body.setCollideWorldBounds(true);
-        placeHolder.body.setMaxVelocityX(250);
+        
 
         this.player2 = placeHolder;
         this.players.set('p2', this.player2);
@@ -190,7 +198,7 @@ export class JuegoScene extends Phaser.Scene {
     spawnPiece() {
         //Si no hay piezas en el array, se generan las dos piezas iniciales
 
-        if(!this.typeArray.length) {
+        if (!this.typeArray.length) {
             this.typeArray.push(this.nextType());
             this.typeArray.push(this.nextType());
         }
@@ -217,22 +225,22 @@ export class JuegoScene extends Phaser.Scene {
     }
 
     updateGroundHitbox() {
-            this.groundHitbox.clear(true, true);
+        this.groundHitbox.clear(true, true);
 
-            this.board.grid.forEach((row, r) => {
-                row.forEach((type, c) => {
-                    if (type) {
-                        const centerX = this.boardX + c * this.cell + this.cell / 2;
-                        const centerY = this.boardY + r * this.cell + this.cell / 2;
+        this.board.grid.forEach((row, r) => {
+            row.forEach((type, c) => {
+                if (type) {
+                    const centerX = this.boardX + c * this.cell + this.cell / 2;
+                    const centerY = this.boardY + r * this.cell + this.cell / 2;
 
-                        const zone = this.add.zone(centerX, centerY, this.cell, this.cell);
-                        this.physics.add.existing(zone, true);
-                        this.groundHitbox.add(zone);
-                    }
-                });
+                    const zone = this.add.zone(centerX, centerY, this.cell, this.cell);
+                    this.physics.add.existing(zone, true);
+                    this.groundHitbox.add(zone);
+                }
             });
-        }
-    
+        });
+    }
+
     nextType() {
         return Phaser.Utils.Array.GetRandom(Object.keys(SHAPES)); //retorna pieza al azar
     }
@@ -280,16 +288,16 @@ export class JuegoScene extends Phaser.Scene {
         const completedRows = this.board.savedLines();
 
         if (completedRows.length > 0) {
-            this.render(); 
+            this.render();
 
             this.time.delayedCall(250, () => {
-                this.linesCleared += this.board.clearLine(); 
+                this.linesCleared += this.board.clearLine();
                 this.updateGroundHitbox();
                 this.linesText.setText('Líneas: ' + this.linesCleared);
-                this.spawnPiece(); 
+                this.spawnPiece();
             });
-            
-         this.sound.play("clinea", { volume: 0.3 });
+
+            this.sound.play("clinea", { volume: 0.3 });
         } else {
             this.spawnPiece();
         }
@@ -297,22 +305,22 @@ export class JuegoScene extends Phaser.Scene {
 
     //dibujaremos el tablero fijo y la pieza activa (piece)
     render() {
-     
+
         this.blocks.clear(true, true); //borramos todo
 
         this.drawNextPiece(0, 70);
         this.drawNextPiece(1, 250);
 
         const lineas = this.board.savedLines();
-        
+
         //r y c = fila y columna. Si existe algo de un tipo en esa casilla, dibuja un cuadrado de ese tipo
         this.board.grid.forEach((row, r) =>
             row.forEach((type, c) => {
-                if(type) {
-                
-                    const cLine = lineas.includes(r);                               
-                     this.drawCell(c, r, type, cLine);
-                    }
+                if (type) {
+
+                    const cLine = lineas.includes(r);
+                    this.drawCell(c, r, type, cLine);
+                }
             })
         );
         if (this.piece) {
@@ -342,7 +350,7 @@ export class JuegoScene extends Phaser.Scene {
             });
         });
     }
-        
+
     gameOver() {
         this.fallTimer.remove();
         this.piece = null;
@@ -357,9 +365,9 @@ export class JuegoScene extends Phaser.Scene {
         const celdaY = this.boardY + row * this.cell + this.cell / 2;
         const sprite = this.add.image(celdaX, celdaY, COLORS[type].key).setDisplaySize(this.cell, this.cell);
 
-       if (isWhite) {
-        sprite.setTintFill(0xffffff);
-    }
+        if (isWhite) {
+            sprite.setTintFill(0xffffff);
+        }
         this.blocks.add(sprite);
     }
 
@@ -369,25 +377,50 @@ export class JuegoScene extends Phaser.Scene {
         return box;
     }
 
-    update() {
-    if (!this.player2 || !this.cursors) return;
+    update(time) {
 
-    const speed = 200;
-    const jumpVelocity = -420;
-    const body = this.player2.body;
+        this.jugador1Mov(time);
+        this.jugador2Mov();
 
-    // Movimiento horizontal
-    if (this.cursors.left.isDown) {
-        body.setVelocityX(-speed);
-    } else if (this.cursors.right.isDown) {
-        body.setVelocityX(speed);
-    } else {
-        body.setVelocityX(0);
     }
 
-    const onGround = body.blocked.down || body.touching.down;
-    if (this.cursors.up.isDown && onGround) {
-        body.setVelocityY(jumpVelocity);
+    jugador1Mov(time) {
+        const FIRST_DELAY = 200;   //ms hasta que empieza a repetir
+        const REPEAT_EVERY = 200;   //ms entre repeticiones
+
+        this.keyHeld.forEach(held => {
+            if (!held.key.isDown) {
+                held.nextAt = null;
+            } else if (held.nextAt === null) {
+                held.action();                       // primera pulsación
+                held.nextAt = time + FIRST_DELAY;
+            } else if (time >= held.nextAt) {
+                held.action();                       // repetición
+                held.nextAt = time + REPEAT_EVERY;
+            }
+        });
     }
+
+    jugador2Mov() {
+        if (!this.player2 || !this.cursors) return;
+
+        const speed = 300;
+        const jumpVelocity = -420;
+        const body = this.player2.body;
+
+        body.setMaxVelocityX(1000);
+        // Movimiento horizontal
+        if (this.cursors.left.isDown) {
+            body.setVelocityX(-speed);
+        } else if (this.cursors.right.isDown) {
+            body.setVelocityX(speed);
+        } else {
+            body.setVelocityX(0);
+        }
+
+        const onGround = body.blocked.down || body.touching.down;
+        if (this.cursors.up.isDown && onGround) {
+            body.setVelocityY(jumpVelocity);
+        }
     }
 }
