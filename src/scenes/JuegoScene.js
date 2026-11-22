@@ -116,7 +116,7 @@ export class JuegoScene extends Phaser.Scene {
 
         //GRAVEDAD diferente a la de Jugador 2, más sencillo usar la de Phaser con el 2
         this.fallTimer = this.time.addEvent({
-            delay: 400, loop: true, callback: () => this.stepDown()
+            delay: 350, loop: true, callback: () => this.stepDown()
         });
 
         //MAPEADO DE CONTROLES
@@ -138,9 +138,9 @@ export class JuegoScene extends Phaser.Scene {
 
         //Acciones mantenidas
         this.keyHeld = [
-            { key: kb.addKey('A'), action: () => this.movePiece(-1), nextAt: null },
-            { key: kb.addKey('D'), action: () => this.movePiece(1), nextAt: null },
-            { key: kb.addKey('S'), action: () => this.stepDown(), nextAt: null },
+            { key: kb.addKey('A'), action: () => this.movePiece(-1), nextAt: null, repeatAfter: 120 },
+            { key: kb.addKey('D'), action: () => this.movePiece(1), nextAt: null, repeatAfter: 120 },
+            { key: kb.addKey('S'), action: () => this.stepDown(), nextAt: null, repeatAfter: 90 },
         ];
 
         this.events.once('shutdown', () => {
@@ -386,17 +386,17 @@ export class JuegoScene extends Phaser.Scene {
 
     jugador1Mov(time) {
         const FIRST_DELAY = 200;   //ms hasta que empieza a repetir
-        const REPEAT_EVERY = 200;   //ms entre repeticiones
+        //const REPEAT_EVERY = 200;   //ms entre repeticiones
 
         this.keyHeld.forEach(held => {
             if (!held.key.isDown) {
                 held.nextAt = null;
             } else if (held.nextAt === null) {
-                held.action();                       // primera pulsación
+                held.action();                       //primera pulsación
                 held.nextAt = time + FIRST_DELAY;
             } else if (time >= held.nextAt) {
-                held.action();                       // repetición
-                held.nextAt = time + REPEAT_EVERY;
+                held.action();                       //repetición
+                held.nextAt = time + held.repeatAfter;
             }
         });
     }
