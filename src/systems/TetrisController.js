@@ -13,6 +13,8 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.nextTypes = [];
         this.linesCleared = 0;
         this.fallTimer = null;
+        this.lockTimer = null;
+        this.lockResets = 0;
     };
 
     start() {
@@ -48,6 +50,8 @@ export class TetrisController extends Phaser.Events.EventEmitter {
             return;
         }
         this.emit('changed');
+        this.lockResets = 0;
+        this.updateLockTimer();
     }
 
     movePiece(dx) {
@@ -56,6 +60,7 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         if (this.board.isValid(matrix, x + dx, y)) {
             this.piece.x += dx;
             this.emit('changed');
+            this.updateLockTimer(true);
         }
     }
 
@@ -66,6 +71,7 @@ export class TetrisController extends Phaser.Events.EventEmitter {
             this.piece.matrix = rotated;
             this.emit('rotated');
             this.emit('changed');
+            this.updateLockTimer(true);
         }
     }
 
@@ -76,7 +82,8 @@ export class TetrisController extends Phaser.Events.EventEmitter {
             this.piece.y++;
             this.emit('changed');
         } else {
-            this.lockPiece();
+            //el temporizador controla que se lockee
+            this.updateLockTimer(false);
         }
     }
 
@@ -85,6 +92,8 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.board.lockPiece(matrix, x, y, type);
         this.piece = null;
         this.emit('locked');
+        this.cancelLockTimer();
+        this.lockResets = 0;
 
         if (this.board.savedLines().length > 0) {
             this.emit('linesFull');   //el renderer pinta las filas en blanco
@@ -95,6 +104,44 @@ export class TetrisController extends Phaser.Events.EventEmitter {
             });
         } else {
             this.spawnPiece();
+        }
+    }
+
+    isGrounded() {
+        const { matrix, x, y } = this.piece;
+        return !this.board.isValid(matrix, x, y + 1);
+    }
+
+    //TEMPORIZADOR DE LAS PIEZAS ANTES DE LOCKEARSE
+    //resetIfRunning = true cuando el jugador mueve o rota la pieza.
+    updateLockTimer(resetIfRunning = false) {
+        if (!this.piece) return;
+
+        if (!this.isGrounded()) {
+            this.cancelLockTimer();      // se movió a un sitio donde puede seguir cayendo
+            return;
+        }
+
+        if (!this.lockTimer) {
+            this.startLockTimer();
+        } else if (resetIfRunning && this.lockResets < Balance.tetris.maxLockResets) {
+            this.lockResets++;
+            this.cancelLockTimer();
+            this.startLockTimer();
+        }
+    }
+
+    startLockTimer() {
+        this.lockTimer = this.scene.time.delayedCall(Balance.tetris.lockDelay, () => {
+            this.lockTimer = null;
+            if (this.piece && this.isGrounded()) this.lockPiece();
+        });
+    }
+
+    cancelLockTimer() {
+        if (this.lockTimer) {
+            this.lockTimer.remove(false);
+            this.lockTimer = null;
         }
     }
 

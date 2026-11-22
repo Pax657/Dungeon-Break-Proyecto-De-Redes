@@ -3,6 +3,7 @@ export const Balance = {
         fallDelay: 350, //ms entre caídas automáticas
         firstRepeatDelay: 200, //ms antes de que una tecla mantenida se repita
         lineClearDelay: 250, //ms que está la línea blanca al hacer línea
+        lockDelay: 500, //ms antes de lockearse
         keys: {
             left:  { repeatAfter: 120 },
             right: { repeatAfter: 120 },
