@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import { GameScene } from './scenes/GameScene.js';
 import { MenuScene } from './scenes/MenuScene.js';
 import { PauseScene } from './scenes/PauseScene.js';
 import { CreditosScene } from './scenes/CreditosScene.js';
@@ -14,7 +13,7 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [MenuScene, JuegoScene, PauseScene, GameScene, CreditosScene],    // The first scene starts automatically
+    scene: [MenuScene, JuegoScene, PauseScene, CreditosScene],    // The first scene starts automatically
 
     physics: {
         default: 'arcade',
