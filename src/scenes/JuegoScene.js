@@ -81,6 +81,21 @@ export class JuegoScene extends Phaser.Scene {
         });
 
         this.setUpBoard(width, height);
+
+        this.boardWallsHitbox = this.physics.add.staticGroup();
+        this.groundHitbox = this.physics.add.staticGroup();
+        this.eternalGroundHitbox = this.physics.add.staticGroup();
+
+        this.createEternalGround();
+        this.createBoardWalls();
+
+        this.createPlayer2();
+        
+        this.physics.add.collider(this.player2, this.eternalGroundHitbox);
+        this.physics.add.collider(this.player2, this.groundHitbox);
+        this.physics.add.collider(this.player2, this.boardWallsHitbox);
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
     }
 
     setUpBoard(width, height) {
@@ -106,6 +121,7 @@ export class JuegoScene extends Phaser.Scene {
 
         //MAPEADO DE CONTROLES
         const kb = this.input.keyboard;
+
         this.inputMappings = [
             { key: 'A', action: () => this.movePiece(-1) },
             { key: 'D', action: () => this.movePiece(1) },
@@ -124,6 +140,52 @@ export class JuegoScene extends Phaser.Scene {
         });
     }
 
+    createEternalGround() {
+        const { cols, rows } = Layout.board;
+        const boardWidth = cols * this.cell;
+        const floorHeight = 24;
+        const centerX = this.boardX + boardWidth / 2;
+        const centerY = this.boardY + rows * this.cell + floorHeight / 2;
+
+        const floor = this.add.zone(centerX, centerY, boardWidth, floorHeight);
+        this.physics.add.existing(floor, true); // true = cuerpo estático
+        this.eternalGroundHitbox.add(floor);
+    }
+
+    createBoardWalls() {
+        const { cols, rows } = Layout.board;
+        const boardWidth = cols * this.cell;
+        const boardHeight = rows * this.cell;
+        const wallThickness = 24;
+
+        //pared izquierda
+        const leftX = this.boardX - wallThickness / 2;
+        const centerY = this.boardY + boardHeight / 2;
+        const leftWall = this.add.zone(leftX, centerY, wallThickness, boardHeight);
+        this.physics.add.existing(leftWall, true);
+        this.boardWallsHitbox.add(leftWall);
+
+        //pared derecha
+        const rightX = this.boardX + boardWidth + wallThickness / 2;
+        const rightWall = this.add.zone(rightX, centerY, wallThickness, boardHeight);
+        this.physics.add.existing(rightWall, true);
+        this.boardWallsHitbox.add(rightWall);
+    }
+
+    createPlayer2(){
+        const size = this.cell * 0.7;
+        const startX = this.boardX + (Layout.board.cols * this.cell) / 2;
+        const startY = this.boardY + (Layout.board.rows * this.cell) - size;
+
+        const placeHolder = this.add.rectangle(startX, startY, size, size, 0xff9900);
+        this.physics.add.existing(placeHolder); // Cuerpo dinámico por defecto
+
+        placeHolder.body.setCollideWorldBounds(true);
+        placeHolder.body.setMaxVelocityX(250);
+
+        this.player2 = placeHolder;
+        this.players.set('p2', this.player2);
+    }
 
     spawnPiece() {
         //Si no hay piezas en el array, se generan las dos piezas iniciales
@@ -154,6 +216,23 @@ export class JuegoScene extends Phaser.Scene {
         this.render();
     }
 
+    updateGroundHitbox() {
+            this.groundHitbox.clear(true, true);
+
+            this.board.grid.forEach((row, r) => {
+                row.forEach((type, c) => {
+                    if (type) {
+                        const centerX = this.boardX + c * this.cell + this.cell / 2;
+                        const centerY = this.boardY + r * this.cell + this.cell / 2;
+
+                        const zone = this.add.zone(centerX, centerY, this.cell, this.cell);
+                        this.physics.add.existing(zone, true);
+                        this.groundHitbox.add(zone);
+                    }
+                });
+            });
+        }
+    
     nextType() {
         return Phaser.Utils.Array.GetRandom(Object.keys(SHAPES)); //retorna pieza al azar
     }
@@ -194,6 +273,9 @@ export class JuegoScene extends Phaser.Scene {
     lockPiece() {
         const { matrix, x, y, type } = this.piece;
         this.board.lockPiece(matrix, x, y, type);
+
+        this.updateGroundHitbox();
+
         this.piece = null;
         const completedRows = this.board.savedLines();
 
@@ -202,6 +284,7 @@ export class JuegoScene extends Phaser.Scene {
 
             this.time.delayedCall(250, () => {
                 this.linesCleared += this.board.clearLine(); 
+                this.updateGroundHitbox();
                 this.linesText.setText('Líneas: ' + this.linesCleared);
                 this.spawnPiece(); 
             });
@@ -284,5 +367,27 @@ export class JuegoScene extends Phaser.Scene {
         const box = this.add.image(width * pos.x, height * pos.y, key);
         box.setScale((width * Layout.infoBox.widthRatio) / box.width);
         return box;
+    }
+
+    update() {
+    if (!this.player2 || !this.cursors) return;
+
+    const speed = 200;
+    const jumpVelocity = -420;
+    const body = this.player2.body;
+
+    // Movimiento horizontal
+    if (this.cursors.left.isDown) {
+        body.setVelocityX(-speed);
+    } else if (this.cursors.right.isDown) {
+        body.setVelocityX(speed);
+    } else {
+        body.setVelocityX(0);
+    }
+
+    const onGround = body.blocked.down || body.touching.down;
+    if (this.cursors.up.isDown && onGround) {
+        body.setVelocityY(jumpVelocity);
+    }
     }
 }

@@ -14,13 +14,15 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
+    scene: [MenuScene, JuegoScene, PauseScene, GameScene, CreditosScene],    // The first scene starts automatically
+
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 }
+            gravity: { y: 600 },
+            debug: true
         }
     },
-    scene: [MenuScene, JuegoScene, PauseScene, GameScene, CreditosScene]      // The first scene starts automatically
 };
 
 const game = new Phaser.Game(config);
