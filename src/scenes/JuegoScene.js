@@ -68,6 +68,15 @@ export class JuegoScene extends Phaser.Scene {
         this.normalSpeed = Balance.j2.speed;
         this.normalFallSpeed = Balance.tetris.keys.down.repeatAfter;
         this.normalLockDelay = Balance.tetris.lockDelay;
+
+        //si había un powerup y reiniciamos la escena, reestablecemos todos los valores a los que teníamos
+        this.events.once('shutdown', () => {
+            Balance.j2.speed = this.normalSpeed;
+            Balance.tetris.keys.down.repeatAfter = this.normalFallSpeed;
+            Balance.tetris.lockDelay = this.normalLockDelay;
+        });
+
+        this.cameras.main.fadeIn(500, 0, 0, 0);
     }
 
     createPowerUpMenu() {
