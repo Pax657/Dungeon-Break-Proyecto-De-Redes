@@ -202,6 +202,7 @@ export class JuegoScene extends Phaser.Scene {
         t.on('linesFull', () => {
             this.sound.play(AUDIO.lineClear.key, { volume: Balance.audioVolume });
             redraw();
+            this.renderer.rumble(Balance.tetris.lineClearDelay);
         });
         t.on('linesCleared', (total) => {
             this.world.updateGroundHitbox(t.board);

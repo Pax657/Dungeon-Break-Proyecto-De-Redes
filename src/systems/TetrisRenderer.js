@@ -73,7 +73,31 @@ export class TetrisRenderer {
     addBlock(x, y, type, isWhite = false) {
         const sprite = this.scene.add.image(x, y, COLORS[type].key)
             .setDisplaySize(this.cell, this.cell);
-        if (isWhite) sprite.setTintFill(0xffffff);
+        if (isWhite) {
+            sprite.setTintFill(0xffffff);
+            sprite.isFull = true;
+        }
         this.blocks.add(sprite);
+    }
+
+    rumble(duration = 200, intensity = 3) {
+        const targets = this.blocks.getChildren().filter(b => b.isFull);
+
+        targets.forEach(block => {
+            const baseX = block.x;
+            const baseY = block.y;
+
+            this.scene.tweens.add({
+                targets: block,
+                x: baseX + Phaser.Math.Between(-intensity, intensity),
+                y: baseY + Phaser.Math.Between(-intensity, intensity),
+                duration: 30,
+                yoyo: true,
+                repeat: Math.floor(duration / 60),
+                onComplete: () => {
+                    if (block.active) block.setPosition(baseX, baseY);
+                }
+            })
+        });
     }
 }
