@@ -116,60 +116,60 @@ export class JuegoScene extends Phaser.Scene {
     }
 
     PowerUp1Activation() {
-        if (this.tetris.linesCleared >= 2){
+        if (this.tetris.linesCleared >= 2) {
             this.tetris.nextTypes = ['I', 'I', 'I', 'I', 'I'];
-        }   
+        }
     }
 
     PowerUp2Activation() {
-        if (this.tetris.linesCleared >= 3){
+        if (this.tetris.linesCleared >= 3) {
 
-            if(this.j2SpeedNerftimer){
+            if (this.j2SpeedNerftimer) {
                 this.j2SpeedNerftimer.remove(false);
             }
-            
+
             Balance.j2.speed = 150;
 
-            this.j2SpeedNerftimer = this.time.delayedCall(15000, () =>{
+            this.j2SpeedNerftimer = this.time.delayedCall(15000, () => {
                 Balance.j2.speed = this.normalSpeed;
 
                 this.j2SpeedNerftimer = null;
             });
-        }   
+        }
     }
 
     PowerUp3Activation() {
-        if (this.tetris.linesCleared >= 5){
-            
+        if (this.tetris.linesCleared >= 5) {
+
             console.log('sí llego aquí');
 
-            if(this.j1Bufftimer){
+            if (this.j1Bufftimer) {
                 this.j1Bufftimer.remove(false);
             }
 
             Balance.tetris.keys.down.repeatAfter = 30;
 
             this.inputManager.updateBalance(this, {
-            left: () => this.tetris.movePiece(-1),
-            right: () => this.tetris.movePiece(1),
-            down: () => this.tetris.stepDown(),
-            rotate: () => this.tetris.rotatePiece(),
-            });
-
-            Balance.tetris.lockDelay = 1;
-
-            this.j1Bufftimer = this.time.delayedCall(15000, () =>{
-                Balance.tetris.keys.down.repeatAfter = this.normalFallSpeed;
-                Balance.tetris.lockDelay = this.normalLockDelay;
-
-                this.inputManager.updateBalance(this, {
                 left: () => this.tetris.movePiece(-1),
                 right: () => this.tetris.movePiece(1),
                 down: () => this.tetris.stepDown(),
                 rotate: () => this.tetris.rotatePiece(),
+            });
+
+            Balance.tetris.lockDelay = 1;
+
+            this.j1Bufftimer = this.time.delayedCall(15000, () => {
+                Balance.tetris.keys.down.repeatAfter = this.normalFallSpeed;
+                Balance.tetris.lockDelay = this.normalLockDelay;
+
+                this.inputManager.updateBalance(this, {
+                    left: () => this.tetris.movePiece(-1),
+                    right: () => this.tetris.movePiece(1),
+                    down: () => this.tetris.stepDown(),
+                    rotate: () => this.tetris.rotatePiece(),
                 });;
 
-                this.j1Bufftimer= null;
+                this.j1Bufftimer = null;
             });
         }
     }
@@ -178,7 +178,7 @@ export class JuegoScene extends Phaser.Scene {
 
 
     //Y ACABA AQUÍ
-    
+
     //conecta los sistemas de sonido, renderizado, colisiones y lógica
     connectTetrisEvents() {
         const t = this.tetris;
@@ -199,8 +199,9 @@ export class JuegoScene extends Phaser.Scene {
             this.renderer.setLines(total);
         })
         t.on('gameOver', () => {
-            const { width, height } = this.scale;
-            this.add.text(width / 2, height / 2, 'GAME OVER', { fontSize: '128px' }).setOrigin(0.5);
+            this.music.stop();
+            this.scene.pause();
+            this.scene.launch('GameOverScene');
         })
 
         this.events.once('shutdown', () => t.removeAllListeners());
@@ -223,19 +224,6 @@ export class JuegoScene extends Phaser.Scene {
             this.events.off('resume');
             this.music.destroy();
         });
-    }
-
-    gameOver() {
-        this.fallTimer.remove();
-        this.piece = null;
-
-        //cambiar por escena GAMEOVER
-        //const { width, height } = this.scale;
-        //this.add.text(width / 2, height / 2, 'GAME OVER', { fontSize: '128px' }).setOrigin(0.5);
-        
-        this.scene.pause();
-        this.scene.launch('GameOverScene');
-
     }
 
     createInfoBox(key, pos, width, height) {
