@@ -80,7 +80,7 @@ export class TetrisRenderer {
         this.blocks.add(sprite);
     }
 
-    rumble(duration = 200, intensity = 3) {
+    rumble(duration, intensity = 3) {
         const targets = this.blocks.getChildren().filter(b => b.isFull);
 
         targets.forEach(block => {
