@@ -96,7 +96,8 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.lockResets = 0;
 
         if (this.board.savedLines().length > 0) {
-            this.emit('linesFull');   //el renderer pinta las filas en blanco
+            const fullLines = this.board.savedLines().length; //guardamos la cantidad de líneas que eliminamos
+            this.emit('linesFull', fullLines);   //el renderer pinta las filas en blanco
             this.scene.time.delayedCall(Balance.tetris.lineClearDelay, () => {
                 this.linesCleared += this.board.clearLine();
                 this.emit('linesCleared', this.linesCleared);

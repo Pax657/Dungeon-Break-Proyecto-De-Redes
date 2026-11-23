@@ -9,6 +9,12 @@ export const Balance = {
             right: { repeatAfter: 120 },
             down:  { repeatAfter: 90 },
         },
+        rumbleLevels: {
+            1: { intensity: 2, all: false },
+            2: { intensity: 3, all: false },
+            3: { intensity: 4, all: true },
+            4: { intensity: 6, all: true },
+        }
     },
     j2: {
         speed: 300,

@@ -199,10 +199,10 @@ export class JuegoScene extends Phaser.Scene {
             redraw();
         });
         t.on('rotated', () => this.sound.play(AUDIO.rotate.key, { volume: Balance.audioVolume }));
-        t.on('linesFull', () => {
+        t.on('linesFull', (fullLines) => {
             this.sound.play(AUDIO.lineClear.key, { volume: Balance.audioVolume });
             redraw();
-            this.renderer.rumble(Balance.tetris.lineClearDelay);
+            this.renderer.rumble(Balance.tetris.lineClearDelay, fullLines);
         });
         t.on('linesCleared', (total) => {
             this.world.updateGroundHitbox(t.board);

@@ -1,3 +1,4 @@
+import { Balance } from "../config/Balance";
 import { Layout } from "../config/Layout";
 import { SHAPES, COLORS } from "../config/pieza";
 
@@ -49,7 +50,7 @@ export class TetrisRenderer {
     drawCell(col, row, type, isWhite = false) {
         const x = this.boardX + col * this.cell + this.cell / 2;
         const y = this.boardY + row * this.cell + this.cell / 2;
-        this.addBlock(x, y, type, isWhite);
+        this.addBlock(x, y, type, isWhite).isBoard = true;
     }
 
     drawNextPiece(type, offsetX) {
@@ -78,26 +79,22 @@ export class TetrisRenderer {
             sprite.isFull = true;
         }
         this.blocks.add(sprite);
+        return sprite;
     }
 
-    rumble(duration, intensity = 3) {
-        const targets = this.blocks.getChildren().filter(b => b.isFull);
+    rumble(duration, lines) {
+        const { intensity, all } = Balance.tetris.rumbleLevels[Math.min(lines, 4)];
 
-        targets.forEach(block => {
-            const baseX = block.x;
-            const baseY = block.y;
-
-            this.scene.tweens.add({
-                targets: block,
-                x: baseX + Phaser.Math.Between(-intensity, intensity),
-                y: baseY + Phaser.Math.Between(-intensity, intensity),
-                duration: 30, //ms que tarda en ir hacia la pos aleatoria. Es diferente al duration de arriba
-                yoyo: true, //hace el movimiento hacia atrás y adelante
-                repeat: Math.floor(duration / 60), //usamos la duration de arriba para ver cuántas veces repetimos el movimiento
-                onComplete: () => {
-                    if (block.active) block.setPosition(baseX, baseY);
-                }
+        this.blocks.getChildren().filter(b => all ? b.isBoard : b.isFull) //hacemos el rumble sobre todos o en las líneas llenas
+            .forEach(b => {
+                this.scene.tweens.add({
+                    targets: b,
+                    x: b.x + Phaser.Math.Between(-intensity, intensity),
+                    y: b.y + Phaser.Math.Between(-intensity, intensity),
+                    duration: 30,
+                    yoyo: true,
+                    repeat: Math.floor(duration / 60),
+                })
             })
-        });
     }
 }
