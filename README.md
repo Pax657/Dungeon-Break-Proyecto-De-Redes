@@ -196,5 +196,5 @@ Eslogan: «Escapando una pieza a la vez».<br>
 [1] Phaser Studio. (s. f.). Phaser 3 Documentation. https://docs.phaser.io<br>
 [2] Recursos de terceros utilizados (sprites, música, fuentes): <br>Nombre — autor — licencia — URL.<br>
 [3] Pixel Jump — Lumora_Studios — Uso Gratuito, audio — https://pixabay.com/es/sound-effects/pel%C3%ADculas-y-efectos-especiales-pixel-jump-319167/<br>
-[4] Tetris en Phaser — Jerome_renaux — inspiración en código — https://bitbucket.org/jerome_renaux/tetris/src/master/
-[5] Phaser Tetris — Hugotox — inspiración en código — https://hugotox.github.io/phaser-tetris/
+[4] Tetris en Phaser — Jerome_renaux — inspiración en código — https://bitbucket.org/jerome_renaux/tetris/src/master/ <br>
+[5] Phaser Tetris — Hugotox — inspiración en código — https://hugotox.github.io/phaser-tetris/ <br>
