@@ -43,7 +43,6 @@ export class MenuScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 playBtn.disableInteractive();
                 this.cameras.main.fadeOut(1000, 0, 0, 0, (camera, progress) => {
-                    console.log(progress);
                     if (progress === 1) {
                         this.scene.start('JuegoScene');
                     }
@@ -57,7 +56,14 @@ export class MenuScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => creditsBtn.setStyle({ color: '#ffff00' }))
             .on('pointerout', () => creditsBtn.setStyle({ color: '#00ff00' }))
-            .on('pointerdown', () => this.scene.start('CreditosScene'));
+            .on('pointerdown', () => {
+                creditsBtn.disableInteractive();
+                this.cameras.main.fadeOut(1000, 0, 0, 0, (camera, progress) => {
+                    if (progress === 1) {
+                        this.scene.start('CreditosScene');
+                    }
+                });
+            });
 
         //parar música al cambiar    
         this.events.once('shutdown', () => {
