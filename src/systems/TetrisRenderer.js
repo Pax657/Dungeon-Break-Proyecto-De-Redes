@@ -91,9 +91,9 @@ export class TetrisRenderer {
                 targets: block,
                 x: baseX + Phaser.Math.Between(-intensity, intensity),
                 y: baseY + Phaser.Math.Between(-intensity, intensity),
-                duration: 30,
-                yoyo: true,
-                repeat: Math.floor(duration / 60),
+                duration: 30, //ms que tarda en ir hacia la pos aleatoria. Es diferente al duration de arriba
+                yoyo: true, //hace el movimiento hacia atrás y adelante
+                repeat: Math.floor(duration / 60), //usamos la duration de arriba para ver cuántas veces repetimos el movimiento
                 onComplete: () => {
                     if (block.active) block.setPosition(baseX, baseY);
                 }
