@@ -230,8 +230,12 @@ export class JuegoScene extends Phaser.Scene {
         this.piece = null;
 
         //cambiar por escena GAMEOVER
-        const { width, height } = this.scale;
-        this.add.text(width / 2, height / 2, 'GAME OVER', { fontSize: '128px' }).setOrigin(0.5);
+        //const { width, height } = this.scale;
+        //this.add.text(width / 2, height / 2, 'GAME OVER', { fontSize: '128px' }).setOrigin(0.5);
+        
+        this.scene.pause();
+        this.scene.launch('GameOverScene');
+
     }
 
     createInfoBox(key, pos, width, height) {
