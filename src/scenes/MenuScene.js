@@ -69,5 +69,7 @@ export class MenuScene extends Phaser.Scene {
         this.events.once('shutdown', () => {
             this.music.destroy();
         });
+
+        this.cameras.main.fadeIn(500, 0, 0, 0);
     }
 }

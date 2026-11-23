@@ -114,36 +114,36 @@ export class TetrisController extends Phaser.Events.EventEmitter {
 
     //TEMPORIZADOR DE LAS PIEZAS ANTES DE LOCKEARSE
     //resetIfRunning = true cuando el jugador mueve o rota la pieza.
-    updateLockTimer(resetIfRunning = false) {
-        if (!this.piece) return;
-
-        if (!this.isGrounded()) {
-            this.cancelLockTimer();      // se movió a un sitio donde puede seguir cayendo
-            return;
+        updateLockTimer(resetIfRunning = false) {
+            if (!this.piece) return;
+           
+            if (!this.isGrounded()) {
+                this.cancelLockTimer();      // se movió a un sitio donde puede seguir cayendo
+                return;
+            }
+        
+            if (!this.lockTimer) {
+                this.startLockTimer();
+            } else if (resetIfRunning && this.lockResets < Balance.tetris.maxLockResets) {
+                this.lockResets++;
+                this.cancelLockTimer();
+                this.startLockTimer();
+            }
         }
-
-        if (!this.lockTimer) {
-            this.startLockTimer();
-        } else if (resetIfRunning && this.lockResets < Balance.tetris.maxLockResets) {
-            this.lockResets++;
-            this.cancelLockTimer();
-            this.startLockTimer();
+    
+        startLockTimer() {
+            this.lockTimer = this.scene.time.delayedCall(Balance.tetris.lockDelay, () => {
+                this.lockTimer = null;
+                if (this.piece && this.isGrounded()) this.lockPiece();
+            });
         }
-    }
-
-    startLockTimer() {
-        this.lockTimer = this.scene.time.delayedCall(Balance.tetris.lockDelay, () => {
-            this.lockTimer = null;
-            if (this.piece && this.isGrounded()) this.lockPiece();
-        });
-    }
-
-    cancelLockTimer() {
-        if (this.lockTimer) {
-            this.lockTimer.remove(false);
-            this.lockTimer = null;
+    
+        cancelLockTimer() {
+            if (this.lockTimer) {
+                this.lockTimer.remove(false);
+                this.lockTimer = null;
+            }
         }
-    }
 
     gameOver() {
         this.fallTimer.remove();

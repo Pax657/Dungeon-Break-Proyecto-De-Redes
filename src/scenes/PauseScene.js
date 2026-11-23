@@ -26,8 +26,13 @@ export class PauseScene extends Phaser.Scene {
             .on('pointerover', () => menuBtn.setStyle({ color: '#ffff00' }))
             .on('pointerout', () => menuBtn.setStyle({ color: '#00ff00' }))
             .on('pointerdown', () => {
-                this.scene.stop('JuegoScene');
-                this.scene.start('MenuScene');
+                menuBtn.disableInteractive();
+                this.cameras.main.fadeOut(1000, 0, 0, 0, (camera, progress) => {
+                    if (progress === 1) {
+                        this.scene.stop('JuegoScene');
+                        this.scene.start('MenuScene');
+                    }
+                });
             });
     }
 }
