@@ -64,6 +64,8 @@ La partida termina cuando el jugador 2 es aplastado o el jugador 1 se queda sin 
 Acciones del Jugador 1<br>
 Mover pieza a la izquierda	`A`<br>
 Moverse pieza a la derecha	`D`<br>
+Mover pieza hacia abajo	`S`<br>
+Rotar pieza `W`<br>
 Seleccionar objeto 1 `1`<br>
 Seleccionar objeto 2 `2`<br>
 Seleccionar objeto 3 `3`<br>
@@ -72,7 +74,7 @@ Pausa	`Esc`<br>
 Acciones del Jugador 2<br>
 Moverse a la izquierda	`←`<br>
 Moverse a la derecha	`→`<br>
-Saltar	`↑` o `Espacio`<br>
+Saltar	`↑`<br>
 Pausa	`Esc`<br>
 
 <br>3.3. Mecánicas<br>
@@ -193,4 +195,6 @@ Eslogan: «Escapando una pieza a la vez».<br>
 
 [1] Phaser Studio. (s. f.). Phaser 3 Documentation. https://docs.phaser.io<br>
 [2] Recursos de terceros utilizados (sprites, música, fuentes): <br>Nombre — autor — licencia — URL.<br>
-Pixel Jump — Lumora_Studios — Uso Gratuito — https://pixabay.com/es/sound-effects/pel%C3%ADculas-y-efectos-especiales-pixel-jump-319167/<br>
+[3] Pixel Jump — Lumora_Studios — Uso Gratuito, audio — https://pixabay.com/es/sound-effects/pel%C3%ADculas-y-efectos-especiales-pixel-jump-319167/<br>
+[4] Tetris en Phaser — Jerome_renaux — inspiración en código — https://bitbucket.org/jerome_renaux/tetris/src/master/
+[5] Phaser Tetris — Hugotox — inspiración en código — https://hugotox.github.io/phaser-tetris/
