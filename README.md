@@ -90,7 +90,7 @@ Encasillado de las piezas: Las piezas del jugador 1 bajan a una velocidad de 1 c
 <br>3.3.2. Objetos y power-ups<br>
 
 Jugador 1:<br>
-Fiesta del palo: Las siguientes 4 piezas serán la I. Cuesta 2 líneas.<br>
+Fiesta Palo: Las siguientes 5 piezas serán la I. Cuesta 2 líneas.<br>
 Jugador manco: Reduce la velocidad del Jugador 2 por 15 s. Cuesta 3 líneas.<br>
 Caída libre: Aumenta la velocidad a la que bajan las piezas por 15 s. Cuesta 5 líneas.<br>
 
