@@ -42,15 +42,17 @@ export class TetrisRenderer {
         if (piece) {
             const { matrix, x, y, type } = piece;
             matrix.forEach((row, r) => row.forEach((cell, c) => {
-                if (cell && y + r >= 0) this.drawCell(x + c, y + r, type);
+                if (cell && y + r >= 0) {
+                    this.drawCell(x + c, y + r, type, false, 0.6);
+                }
             }));
         }
     }
 
-    drawCell(col, row, type, isWhite = false) {
+    drawCell(col, row, type, isWhite = false, alpha = 1) {
         const x = this.boardX + col * this.cell + this.cell / 2;
         const y = this.boardY + row * this.cell + this.cell / 2;
-        this.addBlock(x, y, type, isWhite).isBoard = true;
+        this.addBlock(x, y, type, isWhite, alpha).isBoard = true;
     }
 
     drawNextPiece(type, offsetX) {
@@ -71,9 +73,10 @@ export class TetrisRenderer {
         }));
     }
 
-    addBlock(x, y, type, isWhite = false) {
+    addBlock(x, y, type, isWhite = false, alpha = 1) {
         const sprite = this.scene.add.image(x, y, COLORS[type].key)
-            .setDisplaySize(this.cell, this.cell);
+            .setDisplaySize(this.cell, this.cell)
+            .setAlpha(alpha);
         if (isWhite) {
             sprite.setTintFill(0xffffff);
             sprite.isFull = true;
