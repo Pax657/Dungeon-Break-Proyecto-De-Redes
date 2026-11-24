@@ -15,12 +15,18 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.fallTimer = null;
         this.lockTimer = null;
         this.lockResets = 0;
+        this.currentFallDelay = Balance.tetris.fallDelay;
     };
 
+
+    
+    
     start() {
+        this.currentFallDelay = Balance.tetris.fallDelay;
+
         this.spawnPiece();
         this.fallTimer = this.scene.time.addEvent({
-            delay: Balance.tetris.fallDelay,
+            delay: this.currentFallDelay, 
             loop: true,
             callback: () => this.stepDown()
         });
@@ -96,11 +102,19 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.lockResets = 0;
 
         if (this.board.savedLines().length > 0) {
-            const fullLines = this.board.savedLines().length; //guardamos la cantidad de líneas que eliminamos
-            this.emit('linesFull', fullLines);   //el renderer pinta las filas en blanco
+            const fullLines = this.board.savedLines().length; 
+            this.emit('linesFull', fullLines);   
             this.scene.time.delayedCall(Balance.tetris.lineClearDelay, () => {
                 this.linesCleared += this.board.clearLine();
                 this.emit('linesCleared', this.linesCleared);
+                if (this.currentFallDelay > 100) {
+                    this.currentFallDelay -= 15; 
+                    
+                    if (this.fallTimer) {
+                        this.fallTimer.delay = this.currentFallDelay; 
+                    }
+                }
+
                 this.spawnPiece();
             });
         } else {

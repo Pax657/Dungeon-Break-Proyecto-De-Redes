@@ -261,6 +261,8 @@ export class JuegoScene extends Phaser.Scene {
         t.on('linesCleared', (total) => {
             this.world.updateGroundHitbox(t.board);
             this.renderer.setLines(total);
+
+
         })
         t.on('gameOver', () => {
             this.music.stop();
