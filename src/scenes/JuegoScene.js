@@ -39,6 +39,10 @@ export class JuegoScene extends Phaser.Scene {
         }
     }
 
+    init() {
+        this.isGameOver = false;
+    }
+
     create() {
 
         const { width, height } = this.scale;
@@ -248,7 +252,7 @@ export class JuegoScene extends Phaser.Scene {
         const redraw = () => this.renderer.render(t.board, t.piece, t.nextTypes);
 
         t.on('changed', redraw);
-        
+
         t.on('locked', () => {
             this.world.updateGroundHitbox(t.board);
             this.j2.checkCrush();
@@ -261,7 +265,7 @@ export class JuegoScene extends Phaser.Scene {
             redraw();
             this.renderer.rumble(Balance.tetris.lineClearDelay, fullLines);
         });
-        
+
         t.on('linesCleared', (total) => {
             this.world.updateGroundHitbox(t.board);
             this.renderer.setLines(total);
