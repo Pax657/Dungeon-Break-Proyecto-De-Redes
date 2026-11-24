@@ -17,12 +17,27 @@ export class JuegoScene extends Phaser.Scene {
     }
 
     preload() {
-        loadAssets(this);
+    loadAssets(this);
 
-        Object.values(COLORS).forEach(({ key, path }) => {
-            this.load.image(key, path);
-        });
+    Object.values(COLORS).forEach(({ key, path }) => {
+        this.load.image(key, path);
+    });
+
+    // Cargar animación Idle
+    for (let i = 0; i < 7; i++) {
+        this.load.image(`idle_${i}`, `assets/Animaciones/Idle/idle_${i}.png`);
     }
+
+    // Cargar animación Jump
+    for (let i = 0; i < 9; i++) {
+        this.load.image(`jump_${i}`, `assets/Animaciones/Jump/jump_${i}.png`);
+    }
+
+    // Cargar animación Die
+    for (let i = 0; i < 7; i++) {
+        this.load.image(`die_${i}`, `assets/Animaciones/Die/die_${i}.png`);
+    }
+}
 
     create() {
 
@@ -53,6 +68,10 @@ export class JuegoScene extends Phaser.Scene {
         this.renderer = new TetrisRenderer(this, geometry, this.box1)
         this.world = new PhysicalWorld(this, geometry);
         this.tetris = new TetrisController(this, geometry);
+
+        // Crear animaciones antes de crear al jugador
+        this.createPlayerAnimations();
+
         this.j2 = new J2(this, geometry, this.world.colliders);
 
         this.inputManager = new InputManager(this, {
@@ -77,7 +96,42 @@ export class JuegoScene extends Phaser.Scene {
         });
 
         this.cameras.main.fadeIn(500, 0, 0, 0);
+
+
     }
+
+    createPlayerAnimations() {
+
+    // Animación de estar quieto
+    this.anims.create({
+        key: 'idle',
+        frames: Array.from({ length: 7 }, (_, i) => ({
+            key: `idle_${i}`
+        })),
+        frameRate: 8,
+        repeat: -1
+    });
+
+    // Animación de salto
+    this.anims.create({
+        key: 'jump',
+        frames: Array.from({ length: 9 }, (_, i) => ({
+            key: `jump_${i}`
+        })),
+        frameRate: 10,
+        repeat: 0
+    });
+
+    // Animación de muerte
+    this.anims.create({
+        key: 'die',
+        frames: Array.from({ length: 7 }, (_, i) => ({
+            key: `die_${i}`
+        })),
+        frameRate: 8,
+        repeat: 0
+    });
+}
 
     createPowerUpMenu() {
         const boxWidth = this.box1.displayWidth;
