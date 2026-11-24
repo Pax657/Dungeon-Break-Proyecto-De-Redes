@@ -6,30 +6,44 @@ export class J2 {
         const { sizeRatio, maxVelocityX } = Balance.j2;
 
         this.scene = scene;
+        this.geometry = { cell, boardX, boardY, cols, rows }; // Guardamos la geometría para las checks
         this.coins = 0; 
         this.hasDoubleJumpActive = false; 
         this.canDoubleJump = false;    
         this.isFloatingActive = false;
+        this.hasWon = false;
 
         const size = cell * sizeRatio;
         const startX = boardX + (cols * cell) / 2;
         const startY = boardY + rows * cell - size;
 
+        // 1. CUERPO FÍSICO
         const boxSize = size * 0.55;
         this.sprite = scene.physics.add.sprite(startX, startY, 'idle_0');
         this.sprite.body.setSize(boxSize, boxSize);
         this.sprite.body.setCollideWorldBounds(true);
-        this.sprite.body.setMaxVelocityX(maxVelocityX); 
+        this.sprite.body.setMaxVelocityX(maxVelocityX);
         this.sprite.setAlpha(0); 
 
+        // 2. SPRITE VISUAL
         this.animSprite = scene.add.sprite(startX, startY, 'idle_0');
         this.animSprite.setScale(0.02);
         this.animSprite.setOrigin(0.5, 0.5);
 
+        // Colisiones normales contra el suelo y paredes
         colliders.forEach(group =>
             scene.physics.add.collider(this.sprite, group)
         );
 
+        // --- DETECCIÓN DE APLASTAMIENTO (Si un bloque del Tetris choca contra el slime) ---
+        // colliders[1] es 'ground' (los bloques fijos del Tetris) en PhysicalWorld.js
+        if (colliders[1]) {
+            scene.physics.add.overlap(this.sprite, colliders[1], () => {
+                this.checkCrush();
+            });
+        }
+
+        // Texto principal de monedas
         this.coinsText = scene.add.text(scene.box2.x, scene.box2.y - 15, 'Monedas: 0', {
             fontFamily: 'Comic Sans MS',
             fontSize: '34px',
@@ -73,7 +87,7 @@ export class J2 {
     }
 
     update() {
-        if (this.isDead) return;
+        if (this.isDead || this.hasWon) return;
 
         const { speed, jumpVelocity } = Balance.j2;
 
@@ -127,11 +141,47 @@ export class J2 {
             this.animSprite.play('idle');
         }
 
-        const visualOffsetX = 0;  
-        const visualOffsetY = -15;  
+        // --- COMPROBAR CONDICIÓN DE VICTORIA ---
+        // Si el slime entra en la zona del túnel superior derecho (fuera del ancho del tablero por la derecha y arriba)
+        // --- COMPROBAR CONDICIÓN DE VICTORIA ---
+        const { cell, boardX, boardY, cols } = this.geometry;
+        const boardRight = boardX + (cols * cell);
+        
+        // Si el slime pasa del borde derecho y está en la mitad superior del tablero (cerca del túnel)
+        if (this.sprite.x > boardRight - 10 && this.sprite.y < boardY + (cell * 3)) {
+            this.win();
+        }
+        
+        if (this.sprite.x > boardRight && this.sprite.y < boardY + (cell * 2)) {
+            this.win();
+        }
+
+        // --- SINCRONIZACIÓN VISUAL ---
+        const visualOffsetX = 0;   
+        const visualOffsetY = -18; 
 
         this.animSprite.x = this.sprite.x + visualOffsetX;
         this.animSprite.y = this.sprite.y + visualOffsetY;
+    }
+
+    checkCrush() {
+        // Si un bloque cae justo encima del slime (bloqueado por arriba y tocando un bloque)
+        if (this.body.blocked.up || this.body.touching.up) {
+            this.die();
+        }
+    }
+
+    win() {
+        if (this.hasWon || this.isDead) return;
+        this.hasWon = true;
+        this.body.setVelocity(0, 0);
+        this.body.enable = false;
+
+        // Aquí puedes cambiar de escena a una de victoria o mostrar un mensaje
+        console.log("¡Has ganado! El slime ha escapado.");
+        this.scene.time.delayedCall(1000, () => {
+            this.scene.scene.start('MenuScene'); // O la escena de victoria que tengas
+        });
     }
 
     buyPowerUp1() {
@@ -173,7 +223,7 @@ export class J2 {
     }
 
     die() {
-        if (this.isDead) return;
+        if (this.isDead || this.hasWon) return;
 
         this.isDead = true;
         this.currentState = 'die';
@@ -182,5 +232,10 @@ export class J2 {
         this.body.enable = false;
 
         this.animSprite.play('die');
+
+        // Transición a Game Over tras un segundo
+        this.scene.time.delayedCall(1000, () => {
+            this.scene.scene.start('GameOverScene');
+        });
     }
 }
