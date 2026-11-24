@@ -138,12 +138,6 @@ export class J2 {
 
         const { cell, boardX, boardY, cols } = this.geometry;
         const boardRight = boardX + (cols * cell);
-<<<<<<< HEAD
-
-        // Si el slime pasa del borde derecho y está en la mitad superior del tablero (cerca del túnel)
-=======
-        
->>>>>>> 9929e173f82673aeda870323d9cef62ec0c47f56
         if (this.sprite.x > boardRight - 10 && this.sprite.y < boardY + (cell * 3)) {
             this.win();
         }
@@ -152,119 +146,112 @@ export class J2 {
             this.win();
         }
 
-<<<<<<< HEAD
-        // --- SINCRONIZACIÓN VISUAL ---
         const visualOffsetX = 0;
         const visualOffsetY = -18;
-=======
-        const visualOffsetX = 0;   
-        const visualOffsetY = -18; 
->>>>>>> 9929e173f82673aeda870323d9cef62ec0c47f56
 
         this.animSprite.x = this.sprite.x + visualOffsetX;
         this.animSprite.y = this.sprite.y + visualOffsetY;
     }
 
     checkCrush() {
-<<<<<<< HEAD
         if (this.isInsideBlock()) {
-=======
-        
-        if (this.body.blocked.up || this.body.touching.up) {
->>>>>>> 9929e173f82673aeda870323d9cef62ec0c47f56
-            this.die();
+
+            if (this.body.blocked.up || this.body.touching.up) {
+                this.die();
+            }
         }
     }
 
-    win() {
-        if (this.hasWon || this.isDead) return;
-        this.hasWon = true;
-        this.body.setVelocity(0, 0);
-        this.body.enable = false;
+        win() {
+            if (this.hasWon || this.isDead) return;
+            this.hasWon = true;
+            this.body.setVelocity(0, 0);
+            this.body.enable = false;
 
-        console.log("¡Has ganado! El slime ha escapado.");
-        this.scene.time.delayedCall(1000, () => {
-            this.scene.scene.start('MenuScene');
-        });
-    }
-
-    buyPowerUp1() {
-        if (this.coins >= 5) {
-            this.coins -= 5;
-            this.coinsText.setText('Monedas: ' + this.coins);
-            Balance.j2.speed += 150;
-
-            this.scene.time.delayedCall(10000, () => {
-                Balance.j2.speed = Balance.j2.normalSpeed || 300;
+            console.log("¡Has ganado! El slime ha escapado.");
+            this.scene.time.delayedCall(1000, () => {
+                this.scene.scene.start('MenuScene');
             });
         }
-    }
 
-    buyPowerUp2() {
-        if (this.coins >= 8) {
-            this.coins -= 8;
-            this.coinsText.setText('Monedas: ' + this.coins);
+        buyPowerUp1() {
+            if (this.coins >= 5) {
+                this.coins -= 5;
+                this.coinsText.setText('Monedas: ' + this.coins);
+                Balance.j2.speed += 150;
 
-            this.isFloatingActive = true;
+                this.scene.time.delayedCall(10000, () => {
+                    Balance.j2.speed = Balance.j2.normalSpeed || 300;
+                });
+            }
+        }
 
-            this.scene.time.delayedCall(10000, () => {
-                this.isFloatingActive = false;
+        buyPowerUp2() {
+            if (this.coins >= 8) {
+                this.coins -= 8;
+                this.coinsText.setText('Monedas: ' + this.coins);
+
+                this.isFloatingActive = true;
+
+                this.scene.time.delayedCall(10000, () => {
+                    this.isFloatingActive = false;
+                });
+            }
+        }
+
+        buyPowerUp3() {
+            if (this.coins >= 10) {
+                this.coins -= 10;
+                this.coinsText.setText('Monedas: ' + this.coins);
+
+                this.hasDoubleJumpActive = true;
+
+                this.scene.time.delayedCall(12000, () => {
+                    this.hasDoubleJumpActive = false;
+                });
+            }
+        }
+
+        isInsideBlock() {
+            const { cell, boardX, boardY } = this.geometry;
+            const { board, piece } = this.scene.tetris;
+            const inset = 3;   //margen para que apoyarse sobre un bloque no cuente como "dentro"
+            const b = this.body;
+
+            const corners = [
+                [b.left + inset, b.top + inset],
+                [b.right - inset, b.top + inset],
+                [b.left + inset, b.bottom - inset],
+                [b.right - inset, b.bottom - inset],
+            ];
+
+            return corners.some(([px, py]) => {
+                const col = Math.floor((px - boardX) / cell);
+                const row = Math.floor((py - boardY) / cell);
+
+                //Fuera del tablero (por ejemplo, el túnel de salida): no cuenta
+                if (row < 0 || row >= board.rows || col < 0 || col >= board.cols) return false;
+
+                if (board.grid[row][col]) return true;   // pieza ya fijada
+
+                return !!board.grid[row][col];
             });
         }
-    }
 
-    buyPowerUp3() {
-        if (this.coins >= 10) {
-            this.coins -= 10;
-            this.coinsText.setText('Monedas: ' + this.coins);
+        die() {
+            if (this.isDead || this.hasWon) return;
 
-            this.hasDoubleJumpActive = true;
+            this.isDead = true;
+            this.currentState = 'die';
 
-            this.scene.time.delayedCall(12000, () => {
-                this.hasDoubleJumpActive = false;
+            this.body.setVelocity(0, 0);
+            this.body.enable = false;
+
+            this.animSprite.play('die');
+
+            this.scene.time.delayedCall(1000, () => {
+                this.scene.scene.start('GameOverScene');
             });
         }
-    }
-
-    isInsideBlock() {
-        const { cell, boardX, boardY } = this.geometry;
-        const { board, piece } = this.scene.tetris;
-        const inset = 3;   //margen para que apoyarse sobre un bloque no cuente como "dentro"
-        const b = this.body;
-
-        const corners = [
-            [b.left + inset, b.top + inset],
-            [b.right - inset, b.top + inset],
-            [b.left + inset, b.bottom - inset],
-            [b.right - inset, b.bottom - inset],
-        ];
-
-        return corners.some(([px, py]) => {
-            const col = Math.floor((px - boardX) / cell);
-            const row = Math.floor((py - boardY) / cell);
-
-            //Fuera del tablero (por ejemplo, el túnel de salida): no cuenta
-            if (row < 0 || row >= board.rows || col < 0 || col >= board.cols) return false;
-
-            if (board.grid[row][col]) return true;   // pieza ya fijada
-
-            return !!board.grid[row][col];
-        });
-    }
-
-    die() {
-        if (this.isDead || this.hasWon) return;
-
-        this.isDead = true;
-        this.currentState = 'die';
-
-        this.body.setVelocity(0, 0);
-        this.body.enable = false;
-
-        this.animSprite.play('die');
-
-        this.scene.time.delayedCall(1000, () => {
-            this.scene.scene.start('GameOverScene');
-        });
     }
 }
