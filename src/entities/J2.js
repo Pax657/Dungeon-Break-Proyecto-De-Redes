@@ -15,26 +15,28 @@ export class J2 {
         const startX = boardX + (cols * cell) / 2;
         const startY = boardY + rows * cell - size;
 
+        const boxSize = size * 0.55;
         this.sprite = scene.physics.add.sprite(startX, startY, 'idle_0');
-        this.sprite.setDisplaySize(size * 0.03, size * 0.03);
+        this.sprite.body.setSize(boxSize, boxSize);
+        this.sprite.body.setCollideWorldBounds(true);
+        this.sprite.body.setMaxVelocityX(maxVelocityX); 
+        this.sprite.setAlpha(0); 
 
-        this.body = this.sprite.body;
-        this.body.setCollideWorldBounds(true);
-        this.body.setMaxVelocityX(maxVelocityX);
+        this.animSprite = scene.add.sprite(startX, startY, 'idle_0');
+        this.animSprite.setScale(0.02);
+        this.animSprite.setOrigin(0.5, 0.5);
 
         colliders.forEach(group =>
             scene.physics.add.collider(this.sprite, group)
         );
 
-        // Texto principal de monedas
         this.coinsText = scene.add.text(scene.box2.x, scene.box2.y - 15, 'Monedas: 0', {
             fontFamily: 'Comic Sans MS',
             fontSize: '34px',
             color: '#000000',
         }).setOrigin(0.9);
 
-        // Texto de ayuda con los precios de la tienda
-scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] Flotar (8 monedas)\n[3] Doble Salto (10 monedas)', {
+        scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] Flotar (8 monedas)\n[3] Doble Salto (10 monedas)', {
             fontFamily: 'Comic Sans MS',
             fontSize: '20px',
             color: '#000000',
@@ -54,8 +56,7 @@ scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] 
 
         this.isDead = false;
         this.currentState = 'idle';
-
-        this.sprite.play('idle');
+        this.animSprite.play('idle');
 
         this.scene.time.addEvent({
             delay: 2000,
@@ -67,6 +68,10 @@ scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] 
         });
     }
 
+    get body() {
+        return this.sprite.body;
+    }
+
     update() {
         if (this.isDead) return;
 
@@ -74,10 +79,10 @@ scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] 
 
         if (this.keys.left.isDown) {
             this.body.setVelocityX(-speed);
-            this.sprite.setFlipX(true);
+            this.animSprite.setFlipX(true);
         } else if (this.keys.right.isDown) {
             this.body.setVelocityX(speed);
-            this.sprite.setFlipX(false);
+            this.animSprite.setFlipX(false);
         } else {
             this.body.setVelocityX(0);
         }
@@ -115,12 +120,18 @@ scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] 
 
         if (inAir && this.currentState !== 'jump') {
             this.currentState = 'jump';
-            this.sprite.play('jump');
+            this.animSprite.play('jump');
         }
         else if (onGround && this.currentState !== 'idle') {
             this.currentState = 'idle';
-            this.sprite.play('idle');
+            this.animSprite.play('idle');
         }
+
+        const visualOffsetX = 0;  
+        const visualOffsetY = -15;  
+
+        this.animSprite.x = this.sprite.x + visualOffsetX;
+        this.animSprite.y = this.sprite.y + visualOffsetY;
     }
 
     buyPowerUp1() {
@@ -170,6 +181,6 @@ scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] 
         this.body.setVelocity(0, 0);
         this.body.enable = false;
 
-        this.sprite.play('die');
+        this.animSprite.play('die');
     }
 }
