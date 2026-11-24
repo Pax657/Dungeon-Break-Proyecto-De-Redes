@@ -16,17 +16,18 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.lockTimer = null;
         this.lockResets = 0;
         this.currentFallDelay = Balance.tetris.fallDelay;
+        this.frozen = false;
     };
 
 
-    
-    
+
+
     start() {
         this.currentFallDelay = Balance.tetris.fallDelay;
 
         this.spawnPiece();
         this.fallTimer = this.scene.time.addEvent({
-            delay: this.currentFallDelay, 
+            delay: this.currentFallDelay,
             loop: true,
             callback: () => this.stepDown()
         });
@@ -61,7 +62,7 @@ export class TetrisController extends Phaser.Events.EventEmitter {
     }
 
     movePiece(dx) {
-        if (!this.piece) return;
+        if (!this.piece || this.frozen) return;
         const { matrix, x, y } = this.piece;
         if (this.board.isValid(matrix, x + dx, y)) {
             this.piece.x += dx;
@@ -71,7 +72,7 @@ export class TetrisController extends Phaser.Events.EventEmitter {
     }
 
     rotatePiece() {
-        if (!this.piece) return;
+        if (!this.piece || this.frozen) return;
         const rotated = rotateCW(this.piece.matrix);
         if (this.board.isValid(rotated, this.piece.x, this.piece.y)) {
             this.piece.matrix = rotated;
@@ -82,7 +83,7 @@ export class TetrisController extends Phaser.Events.EventEmitter {
     }
 
     stepDown() {
-        if (!this.piece) return;
+        if (!this.piece || this.frozen) return;
         const { matrix, x, y } = this.piece;
         if (this.board.isValid(matrix, x, y + 1)) {
             this.piece.y++;
@@ -102,16 +103,16 @@ export class TetrisController extends Phaser.Events.EventEmitter {
         this.lockResets = 0;
 
         if (this.board.savedLines().length > 0) {
-            const fullLines = this.board.savedLines().length; 
-            this.emit('linesFull', fullLines);   
+            const fullLines = this.board.savedLines().length;
+            this.emit('linesFull', fullLines);
             this.scene.time.delayedCall(Balance.tetris.lineClearDelay, () => {
                 this.linesCleared += this.board.clearLine();
                 this.emit('linesCleared', this.linesCleared);
                 if (this.currentFallDelay > 100) {
-                    this.currentFallDelay -= 15; 
-                    
+                    this.currentFallDelay -= 15;
+
                     if (this.fallTimer) {
-                        this.fallTimer.delay = this.currentFallDelay; 
+                        this.fallTimer.delay = this.currentFallDelay;
                     }
                 }
 
@@ -129,36 +130,42 @@ export class TetrisController extends Phaser.Events.EventEmitter {
 
     //TEMPORIZADOR DE LAS PIEZAS ANTES DE LOCKEARSE
     //resetIfRunning = true cuando el jugador mueve o rota la pieza.
-        updateLockTimer(resetIfRunning = false) {
-            if (!this.piece) return;
-           
-            if (!this.isGrounded()) {
-                this.cancelLockTimer();      // se movió a un sitio donde puede seguir cayendo
-                return;
-            }
-        
-            if (!this.lockTimer) {
-                this.startLockTimer();
-            } else if (resetIfRunning && this.lockResets < Balance.tetris.maxLockResets) {
-                this.lockResets++;
-                this.cancelLockTimer();
-                this.startLockTimer();
-            }
+    updateLockTimer(resetIfRunning = false) {
+        if (!this.piece) return;
+
+        if (!this.isGrounded()) {
+            this.cancelLockTimer();      // se movió a un sitio donde puede seguir cayendo
+            return;
         }
-    
-        startLockTimer() {
-            this.lockTimer = this.scene.time.delayedCall(Balance.tetris.lockDelay, () => {
-                this.lockTimer = null;
-                if (this.piece && this.isGrounded()) this.lockPiece();
-            });
+
+        if (!this.lockTimer) {
+            this.startLockTimer();
+        } else if (resetIfRunning && this.lockResets < Balance.tetris.maxLockResets) {
+            this.lockResets++;
+            this.cancelLockTimer();
+            this.startLockTimer();
         }
-    
-        cancelLockTimer() {
-            if (this.lockTimer) {
-                this.lockTimer.remove(false);
-                this.lockTimer = null;
-            }
+    }
+
+    startLockTimer() {
+        this.lockTimer = this.scene.time.delayedCall(Balance.tetris.lockDelay, () => {
+            this.lockTimer = null;
+            if (this.piece && this.isGrounded()) this.lockPiece();
+        });
+    }
+
+    cancelLockTimer() {
+        if (this.lockTimer) {
+            this.lockTimer.remove(false);
+            this.lockTimer = null;
         }
+    }
+
+    freeze() {
+        this.frozen = true;
+        this.cancelLockTimer();
+        if (this.fallTimer) this.fallTimer.paused = true;
+    }
 
     gameOver() {
         this.fallTimer.remove();

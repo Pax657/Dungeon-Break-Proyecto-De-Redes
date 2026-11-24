@@ -236,19 +236,33 @@ export class J2 {
     };
 
 
-die() {
-    if (this.isDead || this.hasWon) return;
+    die() {
+        if (this.isDead || this.hasWon) return;
 
-    this.isDead = true;
-    this.currentState = 'die';
+        this.isDead = true;
+        this.currentState = 'die';
 
-    this.body.setVelocity(0, 0);
-    this.body.enable = false;
+        this.body.setVelocity(0, 0);
+        this.body.enable = false;
+        this.scene.tetris.freeze();
 
-    this.animSprite.play('die');
+        const cam = this.scene.cameras.main;
 
-    this.scene.time.delayedCall(1000, () => {
-        this.scene.scene.start('GameOverScene');
-    });
-}
+        this.scene.cameras.main.shake(250, 0.01);
+        this.animSprite.play('die');
+        this.animSprite.setTint(0xff4444);
+        //el jugador vibra antes de morir
+        this.scene.tweens.add({
+            targets: this.animSprite,
+            scaleY: this.animSprite.scaleY * 0.2,
+            scaleX: this.animSprite.scaleX * 1.4,
+            duration: 150,
+            ease: 'Quad.easeOut',
+        });
+
+        this.scene.time.delayedCall(600, () => {
+            cam.once('camerafadeoutcomplete', () => this.scene.gameOver());
+            cam.fadeOut(500, 255, 0, 0);
+        });
+    }
 }

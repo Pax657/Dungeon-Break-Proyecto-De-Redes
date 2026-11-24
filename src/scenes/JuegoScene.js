@@ -17,27 +17,27 @@ export class JuegoScene extends Phaser.Scene {
     }
 
     preload() {
-    loadAssets(this);
+        loadAssets(this);
 
-    Object.values(COLORS).forEach(({ key, path }) => {
-        this.load.image(key, path);
-    });
+        Object.values(COLORS).forEach(({ key, path }) => {
+            this.load.image(key, path);
+        });
 
-    // Cargar animación Idle
-    for (let i = 0; i < 7; i++) {
-        this.load.image(`idle_${i}`, `assets/Animaciones/Idle/idle_${i}.png`);
+        // Cargar animación Idle
+        for (let i = 0; i < 7; i++) {
+            this.load.image(`idle_${i}`, `assets/Animaciones/Idle/idle_${i}.png`);
+        }
+
+        // Cargar animación Jump
+        for (let i = 0; i < 9; i++) {
+            this.load.image(`jump_${i}`, `assets/Animaciones/Jump/jump_${i}.png`);
+        }
+
+        // Cargar animación Die
+        for (let i = 0; i < 7; i++) {
+            this.load.image(`die_${i}`, `assets/Animaciones/Die/die_${i}.png`);
+        }
     }
-
-    // Cargar animación Jump
-    for (let i = 0; i < 9; i++) {
-        this.load.image(`jump_${i}`, `assets/Animaciones/Jump/jump_${i}.png`);
-    }
-
-    // Cargar animación Die
-    for (let i = 0; i < 7; i++) {
-        this.load.image(`die_${i}`, `assets/Animaciones/Die/die_${i}.png`);
-    }
-}
 
     create() {
 
@@ -102,36 +102,36 @@ export class JuegoScene extends Phaser.Scene {
 
     createPlayerAnimations() {
 
-    // Animación de estar quieto
-    this.anims.create({
-        key: 'idle',
-        frames: Array.from({ length: 7 }, (_, i) => ({
-            key: `idle_${i}`
-        })),
-        frameRate: 8,
-        repeat: -1
-    });
+        // Animación de estar quieto
+        this.anims.create({
+            key: 'idle',
+            frames: Array.from({ length: 7 }, (_, i) => ({
+                key: `idle_${i}`
+            })),
+            frameRate: 8,
+            repeat: -1
+        });
 
-    // Animación de salto
-    this.anims.create({
-        key: 'jump',
-        frames: Array.from({ length: 9 }, (_, i) => ({
-            key: `jump_${i}`
-        })),
-        frameRate: 10,
-        repeat: 0
-    });
+        // Animación de salto
+        this.anims.create({
+            key: 'jump',
+            frames: Array.from({ length: 9 }, (_, i) => ({
+                key: `jump_${i}`
+            })),
+            frameRate: 10,
+            repeat: 0
+        });
 
-    // Animación de muerte
-    this.anims.create({
-        key: 'die',
-        frames: Array.from({ length: 7 }, (_, i) => ({
-            key: `die_${i}`
-        })),
-        frameRate: 8,
-        repeat: 0
-    });
-}
+        // Animación de muerte
+        this.anims.create({
+            key: 'die',
+            frames: Array.from({ length: 7 }, (_, i) => ({
+                key: `die_${i}`
+            })),
+            frameRate: 8,
+            repeat: 0
+        });
+    }
 
     createPowerUpMenu() {
         const boxWidth = this.box1.displayWidth;
@@ -248,28 +248,26 @@ export class JuegoScene extends Phaser.Scene {
         const redraw = () => this.renderer.render(t.board, t.piece, t.nextTypes);
 
         t.on('changed', redraw);
+        
         t.on('locked', () => {
             this.world.updateGroundHitbox(t.board);
             this.j2.checkCrush();
             redraw();
         });
+
         t.on('rotated', () => this.sound.play(AUDIO.rotate.key, { volume: Balance.audioVolume }));
         t.on('linesFull', (fullLines) => {
             this.sound.play(AUDIO.lineClear.key, { volume: Balance.audioVolume });
             redraw();
             this.renderer.rumble(Balance.tetris.lineClearDelay, fullLines);
         });
+        
         t.on('linesCleared', (total) => {
             this.world.updateGroundHitbox(t.board);
             this.renderer.setLines(total);
-
-
         })
-        t.on('gameOver', () => {
-            this.music.stop();
-            this.scene.pause();
-            this.scene.launch('GameOverScene');
-        })
+
+        t.on('gameOver', () => this.gameOver());
 
         this.events.once('shutdown', () => t.removeAllListeners());
     }
@@ -302,5 +300,13 @@ export class JuegoScene extends Phaser.Scene {
     update(time) {
         this.inputManager.update(time);
         this.j2.update();
+    }
+
+    gameOver() {
+        if (this.isGameOver) return;
+        this.isGameOver = true;
+        this.music.stop();
+        this.scene.pause();
+        this.scene.launch('GameOverScene');
     }
 }

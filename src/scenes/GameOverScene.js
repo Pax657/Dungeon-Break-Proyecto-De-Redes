@@ -39,5 +39,7 @@ export class GameOverScene extends Phaser.Scene {
                     }
                 });
             });
+
+            this.cameras.main.fadeIn(800, 255, 0, 0);
     }
 }
