@@ -155,10 +155,7 @@ export class J2 {
 
     checkCrush() {
         if (this.isInsideBlock()) {
-
-            if (this.body.blocked.up || this.body.touching.up) {
-                this.die();
-            }
+            this.die();
         }
     }
 
@@ -215,7 +212,7 @@ export class J2 {
     isInsideBlock() {
         const { cell, boardX, boardY } = this.geometry;
         const { board, piece } = this.scene.tetris;
-        const inset = 3;   //margen para que apoyarse sobre un bloque no cuente como "dentro"
+        const inset = 3;   // margen para que apoyarse sobre un bloque no cuente como "dentro"
         const b = this.body;
 
         const corners = [
@@ -229,28 +226,29 @@ export class J2 {
             const col = Math.floor((px - boardX) / cell);
             const row = Math.floor((py - boardY) / cell);
 
-            //Fuera del tablero (por ejemplo, el túnel de salida): no cuenta
+            // Fuera del tablero (por ejemplo, el túnel de salida): no cuenta
             if (row < 0 || row >= board.rows || col < 0 || col >= board.cols) return false;
 
             if (board.grid[row][col]) return true;   // pieza ya fijada
 
             return !!board.grid[row][col];
         });
-    }
+    };
 
-    die() {
-        if (this.isDead || this.hasWon) return;
 
-        this.isDead = true;
-        this.currentState = 'die';
+die() {
+    if (this.isDead || this.hasWon) return;
 
-        this.body.setVelocity(0, 0);
-        this.body.enable = false;
+    this.isDead = true;
+    this.currentState = 'die';
 
-        this.animSprite.play('die');
+    this.body.setVelocity(0, 0);
+    this.body.enable = false;
 
-        this.scene.time.delayedCall(1000, () => {
-            this.scene.scene.start('GameOverScene');
-        });
-    }
+    this.animSprite.play('die');
+
+    this.scene.time.delayedCall(1000, () => {
+        this.scene.scene.start('GameOverScene');
+    });
+}
 }
