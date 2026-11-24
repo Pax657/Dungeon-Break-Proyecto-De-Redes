@@ -250,6 +250,7 @@ export class JuegoScene extends Phaser.Scene {
         t.on('changed', redraw);
         t.on('locked', () => {
             this.world.updateGroundHitbox(t.board);
+            this.j2.checkCrush();
             redraw();
         });
         t.on('rotated', () => this.sound.play(AUDIO.rotate.key, { volume: Balance.audioVolume }));
