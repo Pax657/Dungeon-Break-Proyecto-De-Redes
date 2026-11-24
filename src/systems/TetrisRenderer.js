@@ -43,7 +43,7 @@ export class TetrisRenderer {
             const { matrix, x, y, type } = piece;
             matrix.forEach((row, r) => row.forEach((cell, c) => {
                 if (cell && y + r >= 0) {
-                    this.drawCell(x + c, y + r, type, false, 0.6);
+                    this.drawCell(x + c, y + r, type, false, Balance.tetris.activePieceAlpha);
                 }
             }));
         }

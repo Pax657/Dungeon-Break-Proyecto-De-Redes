@@ -14,7 +14,8 @@ export const Balance = {
             2: { intensity: 3, all: false },
             3: { intensity: 4, all: true },
             4: { intensity: 6, all: true },
-        }
+        },
+        activePieceAlpha: 0.6,
     },
     j2: {
         speed: 300,
