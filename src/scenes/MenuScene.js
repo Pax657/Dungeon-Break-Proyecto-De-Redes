@@ -10,6 +10,8 @@ export class MenuScene extends Phaser.Scene {
         this.load.audio('menuMusic', 'assets/Sonidos/CancionPonponTororon.mp3');
 
         this.load.image('fondoMenu', 'assets/images/Background.png');
+
+        this.load.image('Logo', 'assets/Sprites/Logo.png');
     }
     create() {
         const { width, height } = this.scale;
@@ -26,20 +28,23 @@ export class MenuScene extends Phaser.Scene {
         this.music = this.sound.add('menuMusic', { loop: true, volume: 0.3 });
         this.music.play();
 
-        this.add.text(width / 2, 200, 'DUNGEON BREAK DEMO', {
+        /*this.add.text(width / 2, 200, 'DUNGEON BREAK DEMO', {
             fontSize: '128px',
             fontFamily: 'TetrisFont',
             color: '#ffffff'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5);*/
 
-        const playBtn = this.add.text(width / 2, 500, 'Local Play', {
+        const logo = this.add.image(width / 2, 200, 'Logo').setOrigin(0.5, 0.3);
+        logo.setScale(0.35);
+
+        const playBtn = this.add.text(width / 2, 600, 'Local Play', {
             fontSize: '72px',
             fontFamily: 'TetrisFont',
-            color: '#006eff'
+            color: '#ffffff'
         }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
-            .on('pointerover', () => playBtn.setStyle({ color: '#cc00ff' }))
-            .on('pointerout', () => playBtn.setStyle({ color: '#006eff' }))
+            .on('pointerover', () => playBtn.setStyle({ color: '#006eff' }))
+            .on('pointerout', () => playBtn.setStyle({ color: '#ffffff' }))
             .on('pointerdown', () => {
                 playBtn.disableInteractive();
                 this.cameras.main.fadeOut(1000, 0, 0, 0, (camera, progress) => {
@@ -51,11 +56,12 @@ export class MenuScene extends Phaser.Scene {
 
         const creditsBtn = this.add.text(width / 2 + 750, 1000, 'Créditos', {
             fontSize: '64px',
-            color: '#00ff00'
+            fontFamily: 'TetrisFont',
+            color: '#ffffff'
         }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
-            .on('pointerover', () => creditsBtn.setStyle({ color: '#ffff00' }))
-            .on('pointerout', () => creditsBtn.setStyle({ color: '#00ff00' }))
+            .on('pointerover', () => creditsBtn.setStyle({ color: '#a2ff00' }))
+            .on('pointerout', () => creditsBtn.setStyle({ color: '#ffffff' }))
             .on('pointerdown', () => {
                 creditsBtn.disableInteractive();
                 this.cameras.main.fadeOut(1000, 0, 0, 0, (camera, progress) => {
