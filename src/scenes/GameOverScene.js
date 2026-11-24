@@ -5,13 +5,20 @@ export class GameOverScene extends Phaser.Scene {
         super('GameOverScene');
     }
 
+    init(data) {
+        this.winner = data.winner;
+    }
+
     create() {
         const { width, height } = this.scale;
 
         this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
 
         this.add.text(width / 2, 200, 'Game Over', { fontSize: '128px', fontFamily: 'TetrisFont' }).setOrigin(0.5);
-        this.add.text(width / 2, 320, 'JUGADOR 1 GANA', { fontSize: '128px', fontFamily: 'TetrisFont' }).setOrigin(0.5);
+
+        const winnerText = this.winner === 'JUGADOR 1' ? 'JUGADOR 1 HA GANADO' : 'JUGADOR 2 HA GANADO';
+
+        this.add.text(width / 2, 320, winnerText, { fontSize: '128px', fontFamily: 'TetrisFont' }).setOrigin(0.5);
 
         const rematchBtn = this.add.text(width / 2, 550, 'Revancha', { fontSize: '64px', fontFamily: 'TetrisFont', color: 'rgb(255, 255, 255)' }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
@@ -41,6 +48,6 @@ export class GameOverScene extends Phaser.Scene {
                 });
             });
 
-            this.cameras.main.fadeIn(800, 255, 0, 0);
+        this.cameras.main.fadeIn(800, 255, 0, 0);
     }
 }

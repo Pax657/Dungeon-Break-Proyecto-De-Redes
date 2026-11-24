@@ -164,10 +164,15 @@ export class J2 {
         this.hasWon = true;
         this.body.setVelocity(0, 0);
         this.body.enable = false;
+        this.scene.tetris.freeze();
 
+        const cam = this.scene.cameras.main;
+
+        this.scene.cameras.main.shake(250, 0.01);
         console.log("¡Has ganado! El slime ha escapado.");
         this.scene.time.delayedCall(1000, () => {
-            this.scene.scene.start('MenuScene');
+            this.scene.gameOver('JUGADOR 2'); 
+            cam.fadeOut(500, 255, 0, 0);
         });
     }
 
@@ -261,7 +266,7 @@ export class J2 {
         });
 
         this.scene.time.delayedCall(600, () => {
-            cam.once('camerafadeoutcomplete', () => this.scene.gameOver());
+            cam.once('camerafadeoutcomplete', () => this.scene.gameOver('JUGADOR 1')); //gana j1 si el j2 muere aplastado
             cam.fadeOut(500, 255, 0, 0);
         });
     }

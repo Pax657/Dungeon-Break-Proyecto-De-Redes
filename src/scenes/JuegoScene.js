@@ -271,7 +271,7 @@ export class JuegoScene extends Phaser.Scene {
             this.renderer.setLines(total);
         })
 
-        t.on('gameOver', () => this.gameOver());
+        t.on('gameOver', () => this.gameOver('JUGADOR 2'));
 
         this.events.once('shutdown', () => t.removeAllListeners());
     }
@@ -306,11 +306,11 @@ export class JuegoScene extends Phaser.Scene {
         this.j2.update();
     }
 
-    gameOver() {
+    gameOver(winner) {
         if (this.isGameOver) return;
         this.isGameOver = true;
         this.music.stop();
         this.scene.pause();
-        this.scene.launch('GameOverScene');
+        this.scene.launch('GameOverScene', { winner });
     }
 }
