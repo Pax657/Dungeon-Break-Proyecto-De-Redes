@@ -14,6 +14,12 @@ export class MenuScene extends Phaser.Scene {
         this.load.image('Logo', 'assets/Sprites/Logo.png');
     }
     create() {
+        // Para que la fuenta esté cargada desde el principio
+        document.fonts.load('72px TetrisFont').then(() => {
+            this.crearMenu();
+        });
+    }
+    crearMenu() {
         const { width, height } = this.scale;
 
         const background = this.add.image(width / 2, height / 2, 'fondoMenu')
