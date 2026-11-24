@@ -162,96 +162,95 @@ export class J2 {
         }
     }
 
-        win() {
-            if (this.hasWon || this.isDead) return;
-            this.hasWon = true;
-            this.body.setVelocity(0, 0);
-            this.body.enable = false;
+    win() {
+        if (this.hasWon || this.isDead) return;
+        this.hasWon = true;
+        this.body.setVelocity(0, 0);
+        this.body.enable = false;
 
-            console.log("¡Has ganado! El slime ha escapado.");
-            this.scene.time.delayedCall(1000, () => {
-                this.scene.scene.start('MenuScene');
+        console.log("¡Has ganado! El slime ha escapado.");
+        this.scene.time.delayedCall(1000, () => {
+            this.scene.scene.start('MenuScene');
+        });
+    }
+
+    buyPowerUp1() {
+        if (this.coins >= 5) {
+            this.coins -= 5;
+            this.coinsText.setText('Monedas: ' + this.coins);
+            Balance.j2.speed += 150;
+
+            this.scene.time.delayedCall(10000, () => {
+                Balance.j2.speed = Balance.j2.normalSpeed || 300;
             });
         }
+    }
 
-        buyPowerUp1() {
-            if (this.coins >= 5) {
-                this.coins -= 5;
-                this.coinsText.setText('Monedas: ' + this.coins);
-                Balance.j2.speed += 150;
+    buyPowerUp2() {
+        if (this.coins >= 8) {
+            this.coins -= 8;
+            this.coinsText.setText('Monedas: ' + this.coins);
 
-                this.scene.time.delayedCall(10000, () => {
-                    Balance.j2.speed = Balance.j2.normalSpeed || 300;
-                });
-            }
-        }
+            this.isFloatingActive = true;
 
-        buyPowerUp2() {
-            if (this.coins >= 8) {
-                this.coins -= 8;
-                this.coinsText.setText('Monedas: ' + this.coins);
-
-                this.isFloatingActive = true;
-
-                this.scene.time.delayedCall(10000, () => {
-                    this.isFloatingActive = false;
-                });
-            }
-        }
-
-        buyPowerUp3() {
-            if (this.coins >= 10) {
-                this.coins -= 10;
-                this.coinsText.setText('Monedas: ' + this.coins);
-
-                this.hasDoubleJumpActive = true;
-
-                this.scene.time.delayedCall(12000, () => {
-                    this.hasDoubleJumpActive = false;
-                });
-            }
-        }
-
-        isInsideBlock() {
-            const { cell, boardX, boardY } = this.geometry;
-            const { board, piece } = this.scene.tetris;
-            const inset = 3;   //margen para que apoyarse sobre un bloque no cuente como "dentro"
-            const b = this.body;
-
-            const corners = [
-                [b.left + inset, b.top + inset],
-                [b.right - inset, b.top + inset],
-                [b.left + inset, b.bottom - inset],
-                [b.right - inset, b.bottom - inset],
-            ];
-
-            return corners.some(([px, py]) => {
-                const col = Math.floor((px - boardX) / cell);
-                const row = Math.floor((py - boardY) / cell);
-
-                //Fuera del tablero (por ejemplo, el túnel de salida): no cuenta
-                if (row < 0 || row >= board.rows || col < 0 || col >= board.cols) return false;
-
-                if (board.grid[row][col]) return true;   // pieza ya fijada
-
-                return !!board.grid[row][col];
+            this.scene.time.delayedCall(10000, () => {
+                this.isFloatingActive = false;
             });
         }
+    }
 
-        die() {
-            if (this.isDead || this.hasWon) return;
+    buyPowerUp3() {
+        if (this.coins >= 10) {
+            this.coins -= 10;
+            this.coinsText.setText('Monedas: ' + this.coins);
 
-            this.isDead = true;
-            this.currentState = 'die';
+            this.hasDoubleJumpActive = true;
 
-            this.body.setVelocity(0, 0);
-            this.body.enable = false;
-
-            this.animSprite.play('die');
-
-            this.scene.time.delayedCall(1000, () => {
-                this.scene.scene.start('GameOverScene');
+            this.scene.time.delayedCall(12000, () => {
+                this.hasDoubleJumpActive = false;
             });
         }
+    }
+
+    isInsideBlock() {
+        const { cell, boardX, boardY } = this.geometry;
+        const { board, piece } = this.scene.tetris;
+        const inset = 3;   //margen para que apoyarse sobre un bloque no cuente como "dentro"
+        const b = this.body;
+
+        const corners = [
+            [b.left + inset, b.top + inset],
+            [b.right - inset, b.top + inset],
+            [b.left + inset, b.bottom - inset],
+            [b.right - inset, b.bottom - inset],
+        ];
+
+        return corners.some(([px, py]) => {
+            const col = Math.floor((px - boardX) / cell);
+            const row = Math.floor((py - boardY) / cell);
+
+            //Fuera del tablero (por ejemplo, el túnel de salida): no cuenta
+            if (row < 0 || row >= board.rows || col < 0 || col >= board.cols) return false;
+
+            if (board.grid[row][col]) return true;   // pieza ya fijada
+
+            return !!board.grid[row][col];
+        });
+    }
+
+    die() {
+        if (this.isDead || this.hasWon) return;
+
+        this.isDead = true;
+        this.currentState = 'die';
+
+        this.body.setVelocity(0, 0);
+        this.body.enable = false;
+
+        this.animSprite.play('die');
+
+        this.scene.time.delayedCall(1000, () => {
+            this.scene.scene.start('GameOverScene');
+        });
     }
 }
