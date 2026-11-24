@@ -44,7 +44,7 @@ export class J2 {
             color: '#000000',
         }).setOrigin(0.9);
 
-        scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] Flotar (8 monedas)\n[3] Doble Salto (10 monedas)', {
+        scene.add.text(scene.box2.x, scene.box2.y + 60, '[,] Velocidad (5 monedas)\n[.] Flotar (8 monedas)\n[-] Doble Salto (10 monedas)', {
             fontFamily: 'Comic Sans MS',
             fontSize: '20px',
             color: '#000000',
@@ -57,9 +57,9 @@ export class J2 {
             left: kb.addKey(Controls.j2.left),
             right: kb.addKey(Controls.j2.right),
             jump: kb.addKey(Controls.j2.jump),
-            buy1: kb.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
-            buy2: kb.addKey(Phaser.Input.Keyboard.KeyCodes.TWO),
-            buy3: kb.addKey(Phaser.Input.Keyboard.KeyCodes.THREE),
+            buy1: kb.addKey(Phaser.Input.Keyboard.KeyCodes.COMMA),
+            buy2: kb.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
+            buy3: kb.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS),
         };
 
         this.isDead = false;

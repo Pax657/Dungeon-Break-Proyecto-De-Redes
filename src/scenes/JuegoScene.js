@@ -149,37 +149,30 @@ export class JuegoScene extends Phaser.Scene {
         const fontSize = '24px'; //Tamaño de la fuente
 
         const buttonsPowerups = [
-            { label: '2 Líneas: Fiesta Palo', callback: () => this.PowerUp1Activation('PU1') },
-            { label: '3 Líneas: Jugador Cojo', callback: () => this.PowerUp2Activation('PU2') },
-            { label: '5 Líneas: Piezas Rápidas', callback: () => this.PowerUp3Activation('PU3') },
+            { label: '[1] 2 Líneas: Fiesta Palo' },
+            { label: '[2] 3 Líneas: Jugador Cojo' },
+            { label: '[3] 5 Líneas: Piezas Rápidas' },
         ];
 
         this.box1MenuButtons = buttonsPowerups.map(({ label, callback }, index) => {
             const y = startY + index * gap;
 
-            const background = this.add.rectangle(centerX, y, buttonWidth, buttonHeight, 0x1e293b, 0.9)
-                .setStrokeStyle(2, 0x94a3b8)
-                .setInteractive({ useHandCursor: true });
+           
 
             const text = this.add.text(centerX, y, label, {
                 fontSize,
-                color: '#ffffff',
+                color: '#000000',
             }).setOrigin(0.5);
 
-            background.on('pointerover', () => {
-                background.setFillStyle(0x334155, 1);
-                background.setStrokeStyle(2, 0xf8fafc);
-            });
+           
 
-            background.on('pointerout', () => {
-                background.setFillStyle(0x1e293b, 0.9);
-                background.setStrokeStyle(2, 0x94a3b8);
-            });
-
-            background.on('pointerdown', callback);
-
-            return { background, text };
         });
+
+        this.powerUpKeys = {
+            1: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
+            2: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO),
+            3: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE),
+        };
     }
 
     PowerUp1Activation() {
