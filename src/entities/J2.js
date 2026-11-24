@@ -29,15 +29,16 @@ export class J2 {
         // Texto principal de monedas
         this.coinsText = scene.add.text(scene.box2.x, scene.box2.y - 15, 'Monedas: 0', {
             fontFamily: 'Comic Sans MS',
-            fontSize: '22px',
+            fontSize: '34px',
             color: '#000000',
-        }).setOrigin(0.5);
+        }).setOrigin(0.9);
 
         // Texto de ayuda con los precios de la tienda
-        this.shopText = scene.add.text(scene.box2.x, scene.box2.y + 15, '[1] Vel(5) [2] Flotar(8) [3] Doble(10)', {
+scene.add.text(scene.box2.x, scene.box2.y + 60, '[1] Velocidad (5 monedas)\n[2] Flotar (8 monedas)\n[3] Doble Salto (10 monedas)', {
             fontFamily: 'Comic Sans MS',
-            fontSize: '14px',
-            color: '#333333',
+            fontSize: '20px',
+            color: '#000000',
+            align: 'center'
         }).setOrigin(0.5);
 
         const kb = scene.input.keyboard;
