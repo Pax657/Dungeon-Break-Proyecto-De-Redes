@@ -221,7 +221,6 @@ export class J2 {
 
         this.animSprite.play('die');
 
-        // Transición a Game Over tras un segundo
         this.scene.time.delayedCall(1000, () => {
             this.scene.scene.start('GameOverScene');
         });
