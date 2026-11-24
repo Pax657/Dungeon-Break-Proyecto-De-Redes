@@ -17,7 +17,6 @@ export class J2 {
         const startX = boardX + (cols * cell) / 2;
         const startY = boardY + rows * cell - size;
 
-        // 1. CUERPO FÍSICO
         const boxSize = size * 0.55;
         this.sprite = scene.physics.add.sprite(startX, startY, 'idle_0');
         this.sprite.body.setSize(boxSize, boxSize);
@@ -25,25 +24,20 @@ export class J2 {
         this.sprite.body.setMaxVelocityX(maxVelocityX);
         this.sprite.setAlpha(0); 
 
-        // 2. SPRITE VISUAL
         this.animSprite = scene.add.sprite(startX, startY, 'idle_0');
         this.animSprite.setScale(0.02);
         this.animSprite.setOrigin(0.5, 0.5);
 
-        // Colisiones normales contra el suelo y paredes
         colliders.forEach(group =>
             scene.physics.add.collider(this.sprite, group)
         );
 
-        // --- DETECCIÓN DE APLASTAMIENTO (Si un bloque del Tetris choca contra el slime) ---
-        // colliders[1] es 'ground' (los bloques fijos del Tetris) en PhysicalWorld.js
         if (colliders[1]) {
             scene.physics.add.overlap(this.sprite, colliders[1], () => {
                 this.checkCrush();
             });
         }
 
-        // Texto principal de monedas
         this.coinsText = scene.add.text(scene.box2.x, scene.box2.y - 15, 'Monedas: 0', {
             fontFamily: 'Comic Sans MS',
             fontSize: '34px',
@@ -141,13 +135,9 @@ export class J2 {
             this.animSprite.play('idle');
         }
 
-        // --- COMPROBAR CONDICIÓN DE VICTORIA ---
-        // Si el slime entra en la zona del túnel superior derecho (fuera del ancho del tablero por la derecha y arriba)
-        // --- COMPROBAR CONDICIÓN DE VICTORIA ---
         const { cell, boardX, boardY, cols } = this.geometry;
         const boardRight = boardX + (cols * cell);
         
-        // Si el slime pasa del borde derecho y está en la mitad superior del tablero (cerca del túnel)
         if (this.sprite.x > boardRight - 10 && this.sprite.y < boardY + (cell * 3)) {
             this.win();
         }
@@ -156,7 +146,6 @@ export class J2 {
             this.win();
         }
 
-        // --- SINCRONIZACIÓN VISUAL ---
         const visualOffsetX = 0;   
         const visualOffsetY = -18; 
 
@@ -165,7 +154,7 @@ export class J2 {
     }
 
     checkCrush() {
-        // Si un bloque cae justo encima del slime (bloqueado por arriba y tocando un bloque)
+        
         if (this.body.blocked.up || this.body.touching.up) {
             this.die();
         }
@@ -177,10 +166,9 @@ export class J2 {
         this.body.setVelocity(0, 0);
         this.body.enable = false;
 
-        // Aquí puedes cambiar de escena a una de victoria o mostrar un mensaje
         console.log("¡Has ganado! El slime ha escapado.");
         this.scene.time.delayedCall(1000, () => {
-            this.scene.scene.start('MenuScene'); // O la escena de victoria que tengas
+            this.scene.scene.start('MenuScene');
         });
     }
 
