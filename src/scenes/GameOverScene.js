@@ -11,8 +11,9 @@ export class GameOverScene extends Phaser.Scene {
         this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
 
         this.add.text(width / 2, 200, 'Game Over', { fontSize: '128px', fontFamily: 'TetrisFont' }).setOrigin(0.5);
+        this.add.text(width / 2, 320, 'JUGADOR 1 GANA', { fontSize: '128px', fontFamily: 'TetrisFont' }).setOrigin(0.5);
 
-        const rematchBtn = this.add.text(width / 2, 420, 'Revancha', { fontSize: '64px', fontFamily: 'TetrisFont', color: 'rgb(255, 255, 255)' }).setOrigin(0.5)
+        const rematchBtn = this.add.text(width / 2, 550, 'Revancha', { fontSize: '64px', fontFamily: 'TetrisFont', color: 'rgb(255, 255, 255)' }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => rematchBtn.setStyle({ color: '#006eff' }))
             .on('pointerout', () => rematchBtn.setStyle({ color: '#ffffff' }))
